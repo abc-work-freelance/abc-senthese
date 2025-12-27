@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  INSTRUMENTISTE
+}
+
+enum ProthesisType {
+  HIP
+  KNEE
+  SHOULDER
+}
+
+enum ProthesisSubType {
+  PIH_ZIMED
+  PTH_OTIMED
+  PTG_ZIMED
+  PTG_PERMIDCA
+  PTE_INVERSEE
+  PTE_ANATOMIQUE
+}
+
+enum PaymentMode {
+  CASH
+  VIREMENT
+  CHEQUE
+  CARTE_BANCAIRE
+}
+
+enum CommandStatus {
+  VALIDEE
+  AFFECTEE
+  REPORTEE
+  ANNULEE
+  COMPLETEE
+}
+
+// --------------------------------------
+// Models
+// --------------------------------------
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  familyName   String
+  role         UserRole
+  // Application logic must validate string ends with @abc-synthese.com
+  email        String   @unique
+  password     String
+
+  // Relations
+  createdCommands  Command[] @relation("CreatedByAdmin")
+  assignedCommands Command[] @relation("AssignedToInstrumentiste")
+
+  @@map("users")
+}
+
+model Command {
+  id               Int              @id @default(autoincrement())
+  reference        String           @unique
+  type             ProthesisType
+  subType          ProthesisSubType
+  dateIntervention DateTime
+  dateLivraison    DateTime
+  lienIntervention String?
+  ville            String
+  modePaiement     PaymentMode
+  status           CommandStatus    @default(VALIDEE)
+  commentaire      String?
+
+  // File Handling
+  // "CompletionReport(file)" -> Stores URL/Path to file. Nullable if not yet completed.
+  completionReport String?
+  // "Attachments" -> Relation to separate table to handle array of files
+  attachments      Attachment[]
+
+  // Relations: Instrumentiste (Assigned)
+  instrumentisteId Int?
+  instrumentiste   User? @relation("AssignedToInstrumentiste", fields: [instrumentisteId], references: [id])
+
+  // Relations: Admin (Creator)
+  createdById Int
+  createdBy   User @relation("CreatedByAdmin", fields: [createdById], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("commands")
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  url       String   // Path or URL to the downloaded file
+  name      String?  // Original filename
+  createdAt DateTime @default(now())
+
+  // Relation to Command
+  commandId Int
+  command   Command @relation(fields: [commandId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
