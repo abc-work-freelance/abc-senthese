@@ -10,5 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Command'
+export type * from './models/Product'
+export type * from './models/CommandProduct'
 export type * from './models/Attachment'
 export type * from './commonInputTypes'

@@ -50,6 +50,16 @@ export type User = Prisma.UserModel
  */
 export type Command = Prisma.CommandModel
 /**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model CommandProduct
+ * 
+ */
+export type CommandProduct = Prisma.CommandProductModel
+/**
  * Model Attachment
  * 
  */

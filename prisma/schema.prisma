@@ -53,13 +53,13 @@ enum CommandStatus {
 // --------------------------------------
 
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String
-  familyName   String
-  role         UserRole
-  // Application logic must validate string ends with @abc-synthese.com
-  email        String   @unique
-  password     String
+  id         Int      @id @default(autoincrement())
+  name       String
+  familyName String
+  role       UserRole
+  // Validate email ends with @abc-synthese.com in application logic/Zod
+  email      String   @unique
+  password   String
 
   // Relations
   createdCommands  Command[] @relation("CreatedByAdmin")
@@ -82,35 +82,61 @@ model Command {
   commentaire      String?
 
   // File Handling
-  // "CompletionReport(file)" -> Stores URL/Path to file. Nullable if not yet completed.
-  completionReport String?
-  // "Attachments" -> Relation to separate table to handle array of files
+  completionReport String?          // URL/Path to file
   attachments      Attachment[]
 
-  // Relations: Instrumentiste (Assigned)
+  // Relations: Users
   instrumentisteId Int?
-  instrumentiste   User? @relation("AssignedToInstrumentiste", fields: [instrumentisteId], references: [id])
+  instrumentiste   User?            @relation("AssignedToInstrumentiste", fields: [instrumentisteId], references: [id])
+  
+  createdById      Int
+  createdBy        User             @relation("CreatedByAdmin", fields: [createdById], references: [id])
 
-  // Relations: Admin (Creator)
-  createdById Int
-  createdBy   User @relation("CreatedByAdmin", fields: [createdById], references: [id])
+  // Relation: Products via Join Table (to track Quantity)
+  commandProducts  CommandProduct[]
 
   // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@map("commands")
 }
 
+model Product {
+  id              Int              @id @default(autoincrement())
+  code            String           @unique
+  name            String
+  
+  // Relation: Commands via Join Table
+  commandProducts CommandProduct[]
+
+  @@map("products")
+}
+
+// The Join Table for Explicit Many-to-Many
+model CommandProduct {
+  commandId Int
+  command   Command @relation(fields: [commandId], references: [id], onDelete: Cascade)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  quantity  Int     @default(1)
+
+  // Composite ID ensures a product appears only once per command
+  @@id([commandId, productId])
+  @@map("command_products")
+}
+
 model Attachment {
   id        String   @id @default(uuid())
-  url       String   // Path or URL to the downloaded file
+  url       String   // Path or URL to the file
   name      String?  // Original filename
   createdAt DateTime @default(now())
 
   // Relation to Command
   commandId Int
-  command   Command @relation(fields: [commandId], references: [id], onDelete: Cascade)
+  command   Command  @relation(fields: [commandId], references: [id], onDelete: Cascade)
 
   @@map("attachments")
 }

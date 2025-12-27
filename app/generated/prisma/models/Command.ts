@@ -315,6 +315,7 @@ export type CommandWhereInput = {
   attachments?: Prisma.AttachmentListRelationFilter
   instrumentiste?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  commandProducts?: Prisma.CommandProductListRelationFilter
 }
 
 export type CommandOrderByWithRelationInput = {
@@ -337,6 +338,7 @@ export type CommandOrderByWithRelationInput = {
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
   instrumentiste?: Prisma.UserOrderByWithRelationInput
   createdBy?: Prisma.UserOrderByWithRelationInput
+  commandProducts?: Prisma.CommandProductOrderByRelationAggregateInput
 }
 
 export type CommandWhereUniqueInput = Prisma.AtLeast<{
@@ -362,6 +364,7 @@ export type CommandWhereUniqueInput = Prisma.AtLeast<{
   attachments?: Prisma.AttachmentListRelationFilter
   instrumentiste?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  commandProducts?: Prisma.CommandProductListRelationFilter
 }, "id" | "reference">
 
 export type CommandOrderByWithAggregationInput = {
@@ -427,6 +430,7 @@ export type CommandCreateInput = {
   attachments?: Prisma.AttachmentCreateNestedManyWithoutCommandInput
   instrumentiste?: Prisma.UserCreateNestedOneWithoutAssignedCommandsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedCommandsInput
+  commandProducts?: Prisma.CommandProductCreateNestedManyWithoutCommandInput
 }
 
 export type CommandUncheckedCreateInput = {
@@ -447,6 +451,7 @@ export type CommandUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutCommandInput
+  commandProducts?: Prisma.CommandProductUncheckedCreateNestedManyWithoutCommandInput
 }
 
 export type CommandUpdateInput = {
@@ -466,6 +471,7 @@ export type CommandUpdateInput = {
   attachments?: Prisma.AttachmentUpdateManyWithoutCommandNestedInput
   instrumentiste?: Prisma.UserUpdateOneWithoutAssignedCommandsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedCommandsNestedInput
+  commandProducts?: Prisma.CommandProductUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateInput = {
@@ -486,6 +492,7 @@ export type CommandUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutCommandNestedInput
+  commandProducts?: Prisma.CommandProductUncheckedUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandCreateManyInput = {
@@ -742,6 +749,20 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type CommandCreateNestedOneWithoutCommandProductsInput = {
+  create?: Prisma.XOR<Prisma.CommandCreateWithoutCommandProductsInput, Prisma.CommandUncheckedCreateWithoutCommandProductsInput>
+  connectOrCreate?: Prisma.CommandCreateOrConnectWithoutCommandProductsInput
+  connect?: Prisma.CommandWhereUniqueInput
+}
+
+export type CommandUpdateOneRequiredWithoutCommandProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.CommandCreateWithoutCommandProductsInput, Prisma.CommandUncheckedCreateWithoutCommandProductsInput>
+  connectOrCreate?: Prisma.CommandCreateOrConnectWithoutCommandProductsInput
+  upsert?: Prisma.CommandUpsertWithoutCommandProductsInput
+  connect?: Prisma.CommandWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CommandUpdateToOneWithWhereWithoutCommandProductsInput, Prisma.CommandUpdateWithoutCommandProductsInput>, Prisma.CommandUncheckedUpdateWithoutCommandProductsInput>
+}
+
 export type CommandCreateNestedOneWithoutAttachmentsInput = {
   create?: Prisma.XOR<Prisma.CommandCreateWithoutAttachmentsInput, Prisma.CommandUncheckedCreateWithoutAttachmentsInput>
   connectOrCreate?: Prisma.CommandCreateOrConnectWithoutAttachmentsInput
@@ -772,6 +793,7 @@ export type CommandCreateWithoutCreatedByInput = {
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentCreateNestedManyWithoutCommandInput
   instrumentiste?: Prisma.UserCreateNestedOneWithoutAssignedCommandsInput
+  commandProducts?: Prisma.CommandProductCreateNestedManyWithoutCommandInput
 }
 
 export type CommandUncheckedCreateWithoutCreatedByInput = {
@@ -791,6 +813,7 @@ export type CommandUncheckedCreateWithoutCreatedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutCommandInput
+  commandProducts?: Prisma.CommandProductUncheckedCreateNestedManyWithoutCommandInput
 }
 
 export type CommandCreateOrConnectWithoutCreatedByInput = {
@@ -819,6 +842,7 @@ export type CommandCreateWithoutInstrumentisteInput = {
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentCreateNestedManyWithoutCommandInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedCommandsInput
+  commandProducts?: Prisma.CommandProductCreateNestedManyWithoutCommandInput
 }
 
 export type CommandUncheckedCreateWithoutInstrumentisteInput = {
@@ -838,6 +862,7 @@ export type CommandUncheckedCreateWithoutInstrumentisteInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutCommandInput
+  commandProducts?: Prisma.CommandProductUncheckedCreateNestedManyWithoutCommandInput
 }
 
 export type CommandCreateOrConnectWithoutInstrumentisteInput = {
@@ -904,6 +929,100 @@ export type CommandUpdateManyWithWhereWithoutInstrumentisteInput = {
   data: Prisma.XOR<Prisma.CommandUpdateManyMutationInput, Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteInput>
 }
 
+export type CommandCreateWithoutCommandProductsInput = {
+  reference: string
+  type: $Enums.ProthesisType
+  subType: $Enums.ProthesisSubType
+  dateIntervention: Date | string
+  dateLivraison: Date | string
+  lienIntervention?: string | null
+  ville: string
+  modePaiement: $Enums.PaymentMode
+  status?: $Enums.CommandStatus
+  commentaire?: string | null
+  completionReport?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutCommandInput
+  instrumentiste?: Prisma.UserCreateNestedOneWithoutAssignedCommandsInput
+  createdBy: Prisma.UserCreateNestedOneWithoutCreatedCommandsInput
+}
+
+export type CommandUncheckedCreateWithoutCommandProductsInput = {
+  id?: number
+  reference: string
+  type: $Enums.ProthesisType
+  subType: $Enums.ProthesisSubType
+  dateIntervention: Date | string
+  dateLivraison: Date | string
+  lienIntervention?: string | null
+  ville: string
+  modePaiement: $Enums.PaymentMode
+  status?: $Enums.CommandStatus
+  commentaire?: string | null
+  completionReport?: string | null
+  instrumentisteId?: number | null
+  createdById: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutCommandInput
+}
+
+export type CommandCreateOrConnectWithoutCommandProductsInput = {
+  where: Prisma.CommandWhereUniqueInput
+  create: Prisma.XOR<Prisma.CommandCreateWithoutCommandProductsInput, Prisma.CommandUncheckedCreateWithoutCommandProductsInput>
+}
+
+export type CommandUpsertWithoutCommandProductsInput = {
+  update: Prisma.XOR<Prisma.CommandUpdateWithoutCommandProductsInput, Prisma.CommandUncheckedUpdateWithoutCommandProductsInput>
+  create: Prisma.XOR<Prisma.CommandCreateWithoutCommandProductsInput, Prisma.CommandUncheckedCreateWithoutCommandProductsInput>
+  where?: Prisma.CommandWhereInput
+}
+
+export type CommandUpdateToOneWithWhereWithoutCommandProductsInput = {
+  where?: Prisma.CommandWhereInput
+  data: Prisma.XOR<Prisma.CommandUpdateWithoutCommandProductsInput, Prisma.CommandUncheckedUpdateWithoutCommandProductsInput>
+}
+
+export type CommandUpdateWithoutCommandProductsInput = {
+  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
+  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
+  dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ville?: Prisma.StringFieldUpdateOperationsInput | string
+  modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
+  status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
+  commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  completionReport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUpdateManyWithoutCommandNestedInput
+  instrumentiste?: Prisma.UserUpdateOneWithoutAssignedCommandsNestedInput
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedCommandsNestedInput
+}
+
+export type CommandUncheckedUpdateWithoutCommandProductsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  reference?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
+  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
+  dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ville?: Prisma.StringFieldUpdateOperationsInput | string
+  modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
+  status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
+  commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  completionReport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instrumentisteId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdById?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutCommandNestedInput
+}
+
 export type CommandCreateWithoutAttachmentsInput = {
   reference: string
   type: $Enums.ProthesisType
@@ -920,6 +1039,7 @@ export type CommandCreateWithoutAttachmentsInput = {
   updatedAt?: Date | string
   instrumentiste?: Prisma.UserCreateNestedOneWithoutAssignedCommandsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedCommandsInput
+  commandProducts?: Prisma.CommandProductCreateNestedManyWithoutCommandInput
 }
 
 export type CommandUncheckedCreateWithoutAttachmentsInput = {
@@ -939,6 +1059,7 @@ export type CommandUncheckedCreateWithoutAttachmentsInput = {
   createdById: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  commandProducts?: Prisma.CommandProductUncheckedCreateNestedManyWithoutCommandInput
 }
 
 export type CommandCreateOrConnectWithoutAttachmentsInput = {
@@ -973,6 +1094,7 @@ export type CommandUpdateWithoutAttachmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   instrumentiste?: Prisma.UserUpdateOneWithoutAssignedCommandsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedCommandsNestedInput
+  commandProducts?: Prisma.CommandProductUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateWithoutAttachmentsInput = {
@@ -992,6 +1114,7 @@ export type CommandUncheckedUpdateWithoutAttachmentsInput = {
   createdById?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  commandProducts?: Prisma.CommandProductUncheckedUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandCreateManyCreatedByInput = {
@@ -1046,6 +1169,7 @@ export type CommandUpdateWithoutCreatedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUpdateManyWithoutCommandNestedInput
   instrumentiste?: Prisma.UserUpdateOneWithoutAssignedCommandsNestedInput
+  commandProducts?: Prisma.CommandProductUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateWithoutCreatedByInput = {
@@ -1065,6 +1189,7 @@ export type CommandUncheckedUpdateWithoutCreatedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutCommandNestedInput
+  commandProducts?: Prisma.CommandProductUncheckedUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateManyWithoutCreatedByInput = {
@@ -1101,6 +1226,7 @@ export type CommandUpdateWithoutInstrumentisteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUpdateManyWithoutCommandNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedCommandsNestedInput
+  commandProducts?: Prisma.CommandProductUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateWithoutInstrumentisteInput = {
@@ -1120,6 +1246,7 @@ export type CommandUncheckedUpdateWithoutInstrumentisteInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutCommandNestedInput
+  commandProducts?: Prisma.CommandProductUncheckedUpdateManyWithoutCommandNestedInput
 }
 
 export type CommandUncheckedUpdateManyWithoutInstrumentisteInput = {
@@ -1147,10 +1274,12 @@ export type CommandUncheckedUpdateManyWithoutInstrumentisteInput = {
 
 export type CommandCountOutputType = {
   attachments: number
+  commandProducts: number
 }
 
 export type CommandCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachments?: boolean | CommandCountOutputTypeCountAttachmentsArgs
+  commandProducts?: boolean | CommandCountOutputTypeCountCommandProductsArgs
 }
 
 /**
@@ -1168,6 +1297,13 @@ export type CommandCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type CommandCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AttachmentWhereInput
+}
+
+/**
+ * CommandCountOutputType without action
+ */
+export type CommandCountOutputTypeCountCommandProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommandProductWhereInput
 }
 
 
@@ -1191,6 +1327,7 @@ export type CommandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   attachments?: boolean | Prisma.Command$attachmentsArgs<ExtArgs>
   instrumentiste?: boolean | Prisma.Command$instrumentisteArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  commandProducts?: boolean | Prisma.Command$commandProductsArgs<ExtArgs>
   _count?: boolean | Prisma.CommandCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["command"]>
 
@@ -1260,6 +1397,7 @@ export type CommandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   attachments?: boolean | Prisma.Command$attachmentsArgs<ExtArgs>
   instrumentiste?: boolean | Prisma.Command$instrumentisteArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  commandProducts?: boolean | Prisma.Command$commandProductsArgs<ExtArgs>
   _count?: boolean | Prisma.CommandCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CommandIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1277,6 +1415,7 @@ export type $CommandPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
     instrumentiste: Prisma.$UserPayload<ExtArgs> | null
     createdBy: Prisma.$UserPayload<ExtArgs>
+    commandProducts: Prisma.$CommandProductPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1692,6 +1831,7 @@ export interface Prisma__CommandClient<T, Null = never, ExtArgs extends runtime.
   attachments<T extends Prisma.Command$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Command$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   instrumentiste<T extends Prisma.Command$instrumentisteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Command$instrumentisteArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   createdBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  commandProducts<T extends Prisma.Command$commandProductsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Command$commandProductsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommandProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2173,6 +2313,30 @@ export type Command$instrumentisteArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Command.commandProducts
+ */
+export type Command$commandProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommandProduct
+   */
+  select?: Prisma.CommandProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CommandProduct
+   */
+  omit?: Prisma.CommandProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommandProductInclude<ExtArgs> | null
+  where?: Prisma.CommandProductWhereInput
+  orderBy?: Prisma.CommandProductOrderByWithRelationInput | Prisma.CommandProductOrderByWithRelationInput[]
+  cursor?: Prisma.CommandProductWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommandProductScalarFieldEnum | Prisma.CommandProductScalarFieldEnum[]
 }
 
 /**
