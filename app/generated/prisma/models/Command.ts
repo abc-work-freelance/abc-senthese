@@ -47,6 +47,9 @@ export type CommandMinAggregateOutputType = {
   dateLivraison: Date | null
   lienIntervention: string | null
   ville: string | null
+  address: string | null
+  clinique: string | null
+  doctorName: string | null
   modePaiement: $Enums.PaymentMode | null
   status: $Enums.CommandStatus | null
   commentaire: string | null
@@ -66,6 +69,9 @@ export type CommandMaxAggregateOutputType = {
   dateLivraison: Date | null
   lienIntervention: string | null
   ville: string | null
+  address: string | null
+  clinique: string | null
+  doctorName: string | null
   modePaiement: $Enums.PaymentMode | null
   status: $Enums.CommandStatus | null
   commentaire: string | null
@@ -85,6 +91,9 @@ export type CommandCountAggregateOutputType = {
   dateLivraison: number
   lienIntervention: number
   ville: number
+  address: number
+  clinique: number
+  doctorName: number
   modePaiement: number
   status: number
   commentaire: number
@@ -118,6 +127,9 @@ export type CommandMinAggregateInputType = {
   dateLivraison?: true
   lienIntervention?: true
   ville?: true
+  address?: true
+  clinique?: true
+  doctorName?: true
   modePaiement?: true
   status?: true
   commentaire?: true
@@ -137,6 +149,9 @@ export type CommandMaxAggregateInputType = {
   dateLivraison?: true
   lienIntervention?: true
   ville?: true
+  address?: true
+  clinique?: true
+  doctorName?: true
   modePaiement?: true
   status?: true
   commentaire?: true
@@ -156,6 +171,9 @@ export type CommandCountAggregateInputType = {
   dateLivraison?: true
   lienIntervention?: true
   ville?: true
+  address?: true
+  clinique?: true
+  doctorName?: true
   modePaiement?: true
   status?: true
   commentaire?: true
@@ -262,6 +280,9 @@ export type CommandGroupByOutputType = {
   dateLivraison: Date
   lienIntervention: string | null
   ville: string
+  address: string | null
+  clinique: string | null
+  doctorName: string | null
   modePaiement: $Enums.PaymentMode
   status: $Enums.CommandStatus
   commentaire: string | null
@@ -304,6 +325,9 @@ export type CommandWhereInput = {
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
   ville?: Prisma.StringFilter<"Command"> | string
+  address?: Prisma.StringNullableFilter<"Command"> | string | null
+  clinique?: Prisma.StringNullableFilter<"Command"> | string | null
+  doctorName?: Prisma.StringNullableFilter<"Command"> | string | null
   modePaiement?: Prisma.EnumPaymentModeFilter<"Command"> | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFilter<"Command"> | $Enums.CommandStatus
   commentaire?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -327,6 +351,9 @@ export type CommandOrderByWithRelationInput = {
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrderInput | Prisma.SortOrder
   ville?: Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinique?: Prisma.SortOrderInput | Prisma.SortOrder
+  doctorName?: Prisma.SortOrderInput | Prisma.SortOrder
   modePaiement?: Prisma.SortOrder
   status?: Prisma.SortOrder
   commentaire?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,6 +380,9 @@ export type CommandWhereUniqueInput = Prisma.AtLeast<{
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
   ville?: Prisma.StringFilter<"Command"> | string
+  address?: Prisma.StringNullableFilter<"Command"> | string | null
+  clinique?: Prisma.StringNullableFilter<"Command"> | string | null
+  doctorName?: Prisma.StringNullableFilter<"Command"> | string | null
   modePaiement?: Prisma.EnumPaymentModeFilter<"Command"> | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFilter<"Command"> | $Enums.CommandStatus
   commentaire?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -376,6 +406,9 @@ export type CommandOrderByWithAggregationInput = {
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrderInput | Prisma.SortOrder
   ville?: Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
+  clinique?: Prisma.SortOrderInput | Prisma.SortOrder
+  doctorName?: Prisma.SortOrderInput | Prisma.SortOrder
   modePaiement?: Prisma.SortOrder
   status?: Prisma.SortOrder
   commentaire?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -403,6 +436,9 @@ export type CommandScalarWhereWithAggregatesInput = {
   dateLivraison?: Prisma.DateTimeWithAggregatesFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
   ville?: Prisma.StringWithAggregatesFilter<"Command"> | string
+  address?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
+  clinique?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
+  doctorName?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
   modePaiement?: Prisma.EnumPaymentModeWithAggregatesFilter<"Command"> | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusWithAggregatesFilter<"Command"> | $Enums.CommandStatus
   commentaire?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
@@ -421,6 +457,9 @@ export type CommandCreateInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -442,6 +481,9 @@ export type CommandUncheckedCreateInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -462,6 +504,9 @@ export type CommandUpdateInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -483,6 +528,9 @@ export type CommandUncheckedUpdateInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -504,6 +552,9 @@ export type CommandCreateManyInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -522,6 +573,9 @@ export type CommandUpdateManyMutationInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -539,6 +593,9 @@ export type CommandUncheckedUpdateManyInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -568,6 +625,9 @@ export type CommandCountOrderByAggregateInput = {
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
   ville?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  clinique?: Prisma.SortOrder
+  doctorName?: Prisma.SortOrder
   modePaiement?: Prisma.SortOrder
   status?: Prisma.SortOrder
   commentaire?: Prisma.SortOrder
@@ -593,6 +653,9 @@ export type CommandMaxOrderByAggregateInput = {
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
   ville?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  clinique?: Prisma.SortOrder
+  doctorName?: Prisma.SortOrder
   modePaiement?: Prisma.SortOrder
   status?: Prisma.SortOrder
   commentaire?: Prisma.SortOrder
@@ -612,6 +675,9 @@ export type CommandMinOrderByAggregateInput = {
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
   ville?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  clinique?: Prisma.SortOrder
+  doctorName?: Prisma.SortOrder
   modePaiement?: Prisma.SortOrder
   status?: Prisma.SortOrder
   commentaire?: Prisma.SortOrder
@@ -785,6 +851,9 @@ export type CommandCreateWithoutCreatedByInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -805,6 +874,9 @@ export type CommandUncheckedCreateWithoutCreatedByInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -834,6 +906,9 @@ export type CommandCreateWithoutInstrumentisteInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -854,6 +929,9 @@ export type CommandUncheckedCreateWithoutInstrumentisteInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -903,6 +981,9 @@ export type CommandScalarWhereInput = {
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
   ville?: Prisma.StringFilter<"Command"> | string
+  address?: Prisma.StringNullableFilter<"Command"> | string | null
+  clinique?: Prisma.StringNullableFilter<"Command"> | string | null
+  doctorName?: Prisma.StringNullableFilter<"Command"> | string | null
   modePaiement?: Prisma.EnumPaymentModeFilter<"Command"> | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFilter<"Command"> | $Enums.CommandStatus
   commentaire?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -937,6 +1018,9 @@ export type CommandCreateWithoutCommandProductsInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -957,6 +1041,9 @@ export type CommandUncheckedCreateWithoutCommandProductsInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -992,6 +1079,9 @@ export type CommandUpdateWithoutCommandProductsInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1012,6 +1102,9 @@ export type CommandUncheckedUpdateWithoutCommandProductsInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1031,6 +1124,9 @@ export type CommandCreateWithoutAttachmentsInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -1051,6 +1147,9 @@ export type CommandUncheckedCreateWithoutAttachmentsInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -1086,6 +1185,9 @@ export type CommandUpdateWithoutAttachmentsInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1106,6 +1208,9 @@ export type CommandUncheckedUpdateWithoutAttachmentsInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1126,6 +1231,9 @@ export type CommandCreateManyCreatedByInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -1144,6 +1252,9 @@ export type CommandCreateManyInstrumentisteInput = {
   dateLivraison: Date | string
   lienIntervention?: string | null
   ville: string
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
   modePaiement: $Enums.PaymentMode
   status?: $Enums.CommandStatus
   commentaire?: string | null
@@ -1161,6 +1272,9 @@ export type CommandUpdateWithoutCreatedByInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1181,6 +1295,9 @@ export type CommandUncheckedUpdateWithoutCreatedByInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1201,6 +1318,9 @@ export type CommandUncheckedUpdateManyWithoutCreatedByInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1218,6 +1338,9 @@ export type CommandUpdateWithoutInstrumentisteInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1238,6 +1361,9 @@ export type CommandUncheckedUpdateWithoutInstrumentisteInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1258,6 +1384,9 @@ export type CommandUncheckedUpdateManyWithoutInstrumentisteInput = {
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ville?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clinique?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  doctorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modePaiement?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
   status?: Prisma.EnumCommandStatusFieldUpdateOperationsInput | $Enums.CommandStatus
   commentaire?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1316,6 +1445,9 @@ export type CommandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   dateLivraison?: boolean
   lienIntervention?: boolean
   ville?: boolean
+  address?: boolean
+  clinique?: boolean
+  doctorName?: boolean
   modePaiement?: boolean
   status?: boolean
   commentaire?: boolean
@@ -1340,6 +1472,9 @@ export type CommandSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   dateLivraison?: boolean
   lienIntervention?: boolean
   ville?: boolean
+  address?: boolean
+  clinique?: boolean
+  doctorName?: boolean
   modePaiement?: boolean
   status?: boolean
   commentaire?: boolean
@@ -1361,6 +1496,9 @@ export type CommandSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   dateLivraison?: boolean
   lienIntervention?: boolean
   ville?: boolean
+  address?: boolean
+  clinique?: boolean
+  doctorName?: boolean
   modePaiement?: boolean
   status?: boolean
   commentaire?: boolean
@@ -1382,6 +1520,9 @@ export type CommandSelectScalar = {
   dateLivraison?: boolean
   lienIntervention?: boolean
   ville?: boolean
+  address?: boolean
+  clinique?: boolean
+  doctorName?: boolean
   modePaiement?: boolean
   status?: boolean
   commentaire?: boolean
@@ -1392,7 +1533,7 @@ export type CommandSelectScalar = {
   updatedAt?: boolean
 }
 
-export type CommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reference" | "type" | "subType" | "dateIntervention" | "dateLivraison" | "lienIntervention" | "ville" | "modePaiement" | "status" | "commentaire" | "completionReport" | "instrumentisteId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["command"]>
+export type CommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reference" | "type" | "subType" | "dateIntervention" | "dateLivraison" | "lienIntervention" | "ville" | "address" | "clinique" | "doctorName" | "modePaiement" | "status" | "commentaire" | "completionReport" | "instrumentisteId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["command"]>
 export type CommandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachments?: boolean | Prisma.Command$attachmentsArgs<ExtArgs>
   instrumentiste?: boolean | Prisma.Command$instrumentisteArgs<ExtArgs>
@@ -1426,6 +1567,9 @@ export type $CommandPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     dateLivraison: Date
     lienIntervention: string | null
     ville: string
+    address: string | null
+    clinique: string | null
+    doctorName: string | null
     modePaiement: $Enums.PaymentMode
     status: $Enums.CommandStatus
     commentaire: string | null
@@ -1869,6 +2013,9 @@ export interface CommandFieldRefs {
   readonly dateLivraison: Prisma.FieldRef<"Command", 'DateTime'>
   readonly lienIntervention: Prisma.FieldRef<"Command", 'String'>
   readonly ville: Prisma.FieldRef<"Command", 'String'>
+  readonly address: Prisma.FieldRef<"Command", 'String'>
+  readonly clinique: Prisma.FieldRef<"Command", 'String'>
+  readonly doctorName: Prisma.FieldRef<"Command", 'String'>
   readonly modePaiement: Prisma.FieldRef<"Command", 'PaymentMode'>
   readonly status: Prisma.FieldRef<"Command", 'CommandStatus'>
   readonly commentaire: Prisma.FieldRef<"Command", 'String'>

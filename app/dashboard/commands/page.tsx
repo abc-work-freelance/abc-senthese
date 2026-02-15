@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { CommandDialog } from "@/components/commands/CommandDialog"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { UserRole } from "@/app/generated/prisma/client"
+import { UserRole, CommandStatus } from "@/app/generated/prisma/client"
 import { CommandsTable } from "./CommandsTable"
 
 export default async function CommandsPage() {
@@ -19,7 +19,7 @@ export default async function CommandsPage() {
      commands = res.commands as any
   } else if (role === UserRole.INSTRUMENTISTE && userId) {
      const res = await getAllCommands()
-     commands = res.commands?.filter((c: any) => c.instrumentisteId === parseInt(userId)) || []
+     commands = res.commands?.filter((c: any) => c.instrumentisteId === parseInt(userId) && c.status === CommandStatus.AFFECTEE) || []
   }
 
   const { products } = await getAllProducts()

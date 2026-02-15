@@ -17,7 +17,7 @@ export function CommandsTable({ data, products, users, isAdmin }: CommandsTableP
     usersList: users,
     isAdmin: isAdmin,
   })
-
+  console.log(data, products)
   return (
     <DataTable
       data={data}

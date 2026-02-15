@@ -70,6 +70,9 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
       dateLivraison: command?.dateLivraison ? new Date(command.dateLivraison) : new Date(),
       lienIntervention: command?.lienIntervention || "",
       ville: command?.ville || "",
+      address: command?.address || "",
+      clinique: command?.clinique || "",
+      doctorName: command?.doctorName || "",
       modePaiement: command?.modePaiement || PaymentMode.CASH,
       commentaire: command?.commentaire || "",
       instrumentisteId: command?.instrumentisteId?.toString() || undefined,
@@ -141,6 +144,45 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     <FormLabel>Ville</FormLabel>
                     <FormControl>
                         <Input placeholder="City" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="clinique"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Clinique</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Clinique" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="doctorName"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Doctor Name</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Doctor name" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>

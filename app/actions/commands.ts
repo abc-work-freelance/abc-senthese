@@ -19,6 +19,9 @@ export type CreateCommandInput = {
   dateLivraison: Date
   lienIntervention?: string
   ville: string
+  address?: string
+  clinique?: string
+  doctorName?: string
   modePaiement: PaymentMode
   commentaire?: string
   instrumentisteId?: number
@@ -37,7 +40,7 @@ export async function createCommand(data: CreateCommandInput) {
     }
 
     const createdById = parseInt(session.user.id)
-    const { products, ...commandData } = data
+    const { products, address, clinique, doctorName, ...commandData } = data
 
     const command = await prisma.command.create({
       data: {
@@ -67,7 +70,7 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
       return { success: false, message: "Unauthorized" }
     }
 
-    const { products, ...commandData } = data
+    const { products, address, clinique, doctorName, ...commandData } = data
 
     const updateData: any = {
       ...commandData,

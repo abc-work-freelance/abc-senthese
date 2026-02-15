@@ -77,6 +77,9 @@ model Command {
   dateLivraison    DateTime
   lienIntervention String?
   ville            String
+  address          String?
+  clinique         String?
+  doctorName       String?
   modePaiement     PaymentMode
   status           CommandStatus    @default(VALIDEE)
   commentaire      String?

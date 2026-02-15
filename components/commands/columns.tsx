@@ -49,6 +49,18 @@ export const getColumns = ({ productsList, usersList, isAdmin }: CommandColumnsP
     header: "Ville",
   },
   {
+    accessorKey: "address",
+    header: "Address",
+  },
+  {
+    accessorKey: "clinique",
+    header: "Clinique",
+  },
+  {
+    accessorKey: "doctorName",
+    header: "Doctor",
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
