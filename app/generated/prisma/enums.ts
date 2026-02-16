@@ -42,7 +42,7 @@ export const PaymentMode = {
   CASH: 'CASH',
   VIREMENT: 'VIREMENT',
   CHEQUE: 'CHEQUE',
-  CARTE_BANCAIRE: 'CARTE_BANCAIRE'
+  CAHIER_DE_CHARGE: 'CAHIER_DE_CHARGE'
 } as const
 
 export type PaymentMode = (typeof PaymentMode)[keyof typeof PaymentMode]

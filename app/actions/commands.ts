@@ -40,7 +40,7 @@ export async function createCommand(data: CreateCommandInput) {
     }
 
     const createdById = parseInt(session.user.id)
-    const { products, address, clinique, doctorName, ...commandData } = data
+    const { products, ...commandData } = data
 
     const command = await prisma.command.create({
       data: {

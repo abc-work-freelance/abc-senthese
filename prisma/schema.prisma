@@ -37,7 +37,7 @@ enum PaymentMode {
   CASH
   VIREMENT
   CHEQUE
-  CARTE_BANCAIRE
+  CAHIER_DE_CHARGE
 }
 
 enum CommandStatus {
