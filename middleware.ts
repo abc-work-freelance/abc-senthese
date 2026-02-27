@@ -8,13 +8,13 @@ export default withAuth(
 
     // Admin only routes
     if (path.startsWith("/dashboard/products") && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/commands", req.url))
+      return NextResponse.redirect(new URL("/dashboard", req.url))
     }
 
     // Default redirect for /dashboard to /dashboard/commands if accessed directly
-    if (path === "/dashboard") {
-        return NextResponse.redirect(new URL("/dashboard/commands", req.url))
-    }
+    // if (path === "/dashboard") {
+    //     return NextResponse.redirect(new URL("/dashboard/commands", req.url))
+    // }
   },
   {
     callbacks: {

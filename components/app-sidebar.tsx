@@ -22,6 +22,7 @@ import Link from "next/link"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { UserRole } from "@/app/generated/prisma/client"
+import { LogoutModal } from "./elements/Logout-Modal"
 
 export async function AppSidebar() {
   const session = await getServerSession(authOptions)
@@ -55,7 +56,7 @@ export async function AppSidebar() {
                 <>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Commands">
-                      <Link href="/dashboard/commands">
+                      <Link href="/dashboard">
                         <FileText />
                         <span>Commands</span>
                       </Link>
@@ -90,10 +91,10 @@ export async function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
              <SidebarMenuButton asChild tooltip="Sign Out">
-                <Link href="/api/auth/signout">
+                <LogoutModal>
                     <LogOut />
                     <span>Sign Out</span>
-                </Link>
+                </LogoutModal>
              </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

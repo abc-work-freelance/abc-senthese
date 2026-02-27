@@ -45,7 +45,7 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
          session.user.id = token.id as string;
-         session.user.role = token.role as any; // Cast to any to avoid strict type check issues if imports fail, but d.ts should handle it
+         session.user.role = token.role as any;
       }
       return session
     },

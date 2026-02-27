@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { UserRole, CommandStatus } from "@/app/generated/prisma/client"
 import { CommandsTable } from "./CommandsTable"
+import CardsSection from "./CardsSection"
+import { Separator } from "@/components/ui/separator"
 
 export default async function CommandsPage() {
   const session = await getServerSession(authOptions)
@@ -27,8 +29,30 @@ export default async function CommandsPage() {
       where: { role: UserRole.INSTRUMENTISTE }
   })
 
+  const commandsStat = await prisma.command.findMany()
+
+  console.log(commandsStat.filter(x => x.status == "VALIDEE").length)
+
   return (
     <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
+
+      <div className="flex items-center justify-between space-y-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Statistique</h2>
+          {/* <p className="text-muted-foreground">
+            Manage your commands here.
+          </p> */}
+        </div>
+      </div>
+      <CardsSection
+        data={{
+          total: commandsStat.length,
+          affectee: commandsStat.filter(x => x.status == "AFFECTEE").length,
+          completee: commandsStat.filter(x => x.status == "COMPLETEE").length,
+          validee: commandsStat.filter(x => x.status == "VALIDEE").length
+        }}
+      />
+      <Separator />
       <div className="flex items-center justify-between space-y-2">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Commands</h2>
