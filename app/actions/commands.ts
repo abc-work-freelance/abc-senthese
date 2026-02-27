@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { ProthesisType, ProthesisSubType, PaymentMode, CommandStatus } from "@/app/generated/prisma/client"
 import { revalidatePath } from "next/cache"
+import { requirePermission } from "@/lib/permissions"
+import { broadcastEntityChange } from "@/lib/ws-notify"
 
 export type CommandProductInput = {
   productId: number
@@ -34,12 +36,12 @@ export type UpdateCommandInput = Partial<Omit<CreateCommandInput, 'products'>> &
 
 export async function createCommand(data: CreateCommandInput) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session || !session.user || !session.user.id) {
-      return { success: false, message: "Unauthorized" }
+    const perm = await requirePermission("COMMAND_CREATE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
-    const createdById = parseInt(session.user.id)
+    const createdById = perm.userId
     const { products, ...commandData } = data
 
     const command = await prisma.command.create({
@@ -55,6 +57,12 @@ export async function createCommand(data: CreateCommandInput) {
       },
     })
 
+    broadcastEntityChange({
+      entity: "command",
+      action: "created",
+      id: command.id,
+    })
+
     revalidatePath("/commands")
     return { success: true, command }
   } catch (error) {
@@ -68,6 +76,11 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
     const session = await getServerSession(authOptions)
     if (!session) {
       return { success: false, message: "Unauthorized" }
+    }
+
+    const perm = await requirePermission("COMMAND_UPDATE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     const { products, address, clinique, doctorName, ...commandData } = data
@@ -89,6 +102,12 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
     const command = await prisma.command.update({
       where: { id },
       data: updateData,
+    })
+
+    broadcastEntityChange({
+      entity: "command",
+      action: "updated",
+      id: command.id,
     })
 
     revalidatePath(`/commands/${id}`)
@@ -146,15 +165,9 @@ export async function getCommand(id: number) {
 
 export async function deleteCommand(id: number) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return { success: false, message: "Unauthorized" }
-    }
-
-    // Optional: Check if user is ADMIN or the creator
-    const userRole = session.user.role
-    if (userRole !== "ADMIN") {
-        return { success: false, message: "Forbidden: Admins only" }
+    const perm = await requirePermission("COMMAND_DELETE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     await prisma.command.delete({
@@ -171,14 +184,20 @@ export async function deleteCommand(id: number) {
 
 export async function updateCommandStatus(id: number, status: CommandStatus) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return { success: false, message: "Unauthorized" }
+    const perm = await requirePermission("COMMAND_STATUS_UPDATE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     const command = await prisma.command.update({
       where: { id },
       data: { status },
+    })
+
+    broadcastEntityChange({
+      entity: "command",
+      action: "status_changed",
+      id: command.id,
     })
 
     revalidatePath(`/commands/${id}`)

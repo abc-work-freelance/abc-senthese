@@ -57,3 +57,16 @@ export const CommandStatus = {
 } as const
 
 export type CommandStatus = (typeof CommandStatus)[keyof typeof CommandStatus]
+
+
+export const Permission = {
+  COMMAND_CREATE: 'COMMAND_CREATE',
+  COMMAND_UPDATE: 'COMMAND_UPDATE',
+  COMMAND_DELETE: 'COMMAND_DELETE',
+  COMMAND_STATUS_UPDATE: 'COMMAND_STATUS_UPDATE',
+  PRODUCT_CREATE: 'PRODUCT_CREATE',
+  PRODUCT_UPDATE: 'PRODUCT_UPDATE',
+  PRODUCT_DELETE: 'PRODUCT_DELETE'
+} as const
+
+export type Permission = (typeof Permission)[keyof typeof Permission]

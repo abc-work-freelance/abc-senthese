@@ -823,7 +823,8 @@ export const UserScalarFieldEnum = {
   familyName: 'familyName',
   role: 'role',
   email: 'email',
-  password: 'password'
+  password: 'password',
+  permissions: 'permissions'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -952,6 +953,20 @@ export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Permission[]'
+ */
+export type ListEnumPermissionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Permission[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Permission'
+ */
+export type EnumPermissionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Permission'>
     
 
 

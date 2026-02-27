@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { revalidatePath } from "next/cache"
+import { requirePermission } from "@/lib/permissions"
+import { broadcastEntityChange } from "@/lib/ws-notify"
 
 export type CreateProductInput = {
   code: string
@@ -14,13 +16,9 @@ export type UpdateProductInput = Partial<CreateProductInput>
 
 export async function createProduct(data: CreateProductInput) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return { success: false, message: "Unauthorized" }
-    }
-
-    if (session.user.role !== "ADMIN") {
-        return { success: false, message: "Forbidden: Admins only" }
+    const perm = await requirePermission("PRODUCT_CREATE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     const existingProduct = await prisma.product.findUnique({
@@ -35,6 +33,12 @@ export async function createProduct(data: CreateProductInput) {
       data,
     })
 
+    broadcastEntityChange({
+      entity: "product",
+      action: "created",
+      id: product.id,
+    })
+
     revalidatePath("/products")
     return { success: true, product }
   } catch (error) {
@@ -45,18 +49,20 @@ export async function createProduct(data: CreateProductInput) {
 
 export async function updateProduct(id: number, data: UpdateProductInput) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return { success: false, message: "Unauthorized" }
-    }
-
-    if (session.user.role !== "ADMIN") {
-        return { success: false, message: "Forbidden: Admins only" }
+    const perm = await requirePermission("PRODUCT_UPDATE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     const product = await prisma.product.update({
       where: { id },
       data,
+    })
+
+    broadcastEntityChange({
+      entity: "product",
+      action: "updated",
+      id: product.id,
     })
 
     revalidatePath(`/products/${id}`)
@@ -110,17 +116,19 @@ export async function getAllProducts() {
 
 export async function deleteProduct(id: number) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return { success: false, message: "Unauthorized" }
-    }
-
-    if (session.user.role !== "ADMIN") {
-        return { success: false, message: "Forbidden: Admins only" }
+    const perm = await requirePermission("PRODUCT_DELETE")
+    if (!perm.ok) {
+      return { success: false, message: perm.message }
     }
 
     await prisma.product.delete({
       where: { id },
+    })
+
+    broadcastEntityChange({
+      entity: "product",
+      action: "deleted",
+      id,
     })
 
     revalidatePath("/products")

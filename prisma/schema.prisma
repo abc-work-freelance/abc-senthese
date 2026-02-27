@@ -48,18 +48,31 @@ enum CommandStatus {
   COMPLETEE
 }
 
+enum Permission {
+  COMMAND_CREATE
+  COMMAND_UPDATE
+  COMMAND_DELETE
+  COMMAND_STATUS_UPDATE
+  PRODUCT_CREATE
+  PRODUCT_UPDATE
+  PRODUCT_DELETE
+}
+
 // --------------------------------------
 // Models
 // --------------------------------------
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  familyName String
-  role       UserRole
+  id          Int          @id @default(autoincrement())
+  name        String
+  familyName  String
+  role        UserRole
   // Validate email ends with @abc-synthese.com in application logic/Zod
-  email      String   @unique
-  password   String
+  email       String       @unique
+  password    String
+
+  // Fine-grained permissions for admins
+  permissions Permission[] @default([])
 
   // Relations
   createdCommands  Command[] @relation("CreatedByAdmin")

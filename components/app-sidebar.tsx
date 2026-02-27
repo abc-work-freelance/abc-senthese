@@ -16,7 +16,8 @@ import {
   Package, 
   Settings, 
   LogOut,
-  FileText
+  FileText,
+  ShieldCheck
 } from "lucide-react"
 import Link from "next/link"
 import { getServerSession } from "next-auth"
@@ -27,6 +28,7 @@ import { LogoutModal } from "./elements/Logout-Modal"
 export async function AppSidebar() {
   const session = await getServerSession(authOptions)
   const role = session?.user?.role
+  const email = session?.user?.email
 
   return (
     <Sidebar collapsible="icon">
@@ -70,13 +72,24 @@ export async function AppSidebar() {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
+                  {process.env.EMAILADMIN === email && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Permissions">
+                        <Link href="/dashboard/permissions">
+                          <ShieldCheck />
+                          <span>Permissions</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </>
               )}
 
               {role === UserRole.INSTRUMENTISTE && (
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="My Commands">
-                      <Link href="/dashboard/commands">
+                      <Link href="/dashboard">
                         <FileText />
                         <span>My Commands</span>
                       </Link>
