@@ -64,3 +64,8 @@ export type CommandProduct = Prisma.CommandProductModel
  * 
  */
 export type Attachment = Prisma.AttachmentModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel

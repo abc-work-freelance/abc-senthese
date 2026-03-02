@@ -156,3 +156,14 @@ model Attachment {
 
   @@map("attachments")
 }
+
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("push_subscriptions")
+}

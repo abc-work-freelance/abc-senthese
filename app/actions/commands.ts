@@ -174,6 +174,12 @@ export async function deleteCommand(id: number) {
       where: { id },
     })
 
+    broadcastEntityChange({
+      entity: "command",
+      action: "deleted",
+      id,
+    })
+
     revalidatePath("/commands")
     return { success: true, message: "Command deleted successfully" }
   } catch (error) {
