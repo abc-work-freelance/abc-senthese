@@ -24,15 +24,6 @@ enum ProthesisType {
   SHOULDER
 }
 
-enum ProthesisSubType {
-  PIH_ZIMED
-  PTH_OTIMED
-  PTG_ZIMED
-  PTG_PERMIDCA
-  PTE_INVERSEE
-  PTE_ANATOMIQUE
-}
-
 enum PaymentMode {
   CASH
   VIREMENT
@@ -85,7 +76,6 @@ model Command {
   id               Int              @id @default(autoincrement())
   reference        String           @unique
   type             ProthesisType
-  subType          ProthesisSubType
   dateIntervention DateTime
   dateLivraison    DateTime
   lienIntervention String?

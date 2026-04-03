@@ -42,7 +42,6 @@ export type CommandMinAggregateOutputType = {
   id: number | null
   reference: string | null
   type: $Enums.ProthesisType | null
-  subType: $Enums.ProthesisSubType | null
   dateIntervention: Date | null
   dateLivraison: Date | null
   lienIntervention: string | null
@@ -64,7 +63,6 @@ export type CommandMaxAggregateOutputType = {
   id: number | null
   reference: string | null
   type: $Enums.ProthesisType | null
-  subType: $Enums.ProthesisSubType | null
   dateIntervention: Date | null
   dateLivraison: Date | null
   lienIntervention: string | null
@@ -86,7 +84,6 @@ export type CommandCountAggregateOutputType = {
   id: number
   reference: number
   type: number
-  subType: number
   dateIntervention: number
   dateLivraison: number
   lienIntervention: number
@@ -122,7 +119,6 @@ export type CommandMinAggregateInputType = {
   id?: true
   reference?: true
   type?: true
-  subType?: true
   dateIntervention?: true
   dateLivraison?: true
   lienIntervention?: true
@@ -144,7 +140,6 @@ export type CommandMaxAggregateInputType = {
   id?: true
   reference?: true
   type?: true
-  subType?: true
   dateIntervention?: true
   dateLivraison?: true
   lienIntervention?: true
@@ -166,7 +161,6 @@ export type CommandCountAggregateInputType = {
   id?: true
   reference?: true
   type?: true
-  subType?: true
   dateIntervention?: true
   dateLivraison?: true
   lienIntervention?: true
@@ -275,7 +269,6 @@ export type CommandGroupByOutputType = {
   id: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date
   dateLivraison: Date
   lienIntervention: string | null
@@ -320,7 +313,6 @@ export type CommandWhereInput = {
   id?: Prisma.IntFilter<"Command"> | number
   reference?: Prisma.StringFilter<"Command"> | string
   type?: Prisma.EnumProthesisTypeFilter<"Command"> | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFilter<"Command"> | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFilter<"Command"> | Date | string
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -346,7 +338,6 @@ export type CommandOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  subType?: Prisma.SortOrder
   dateIntervention?: Prisma.SortOrder
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -375,7 +366,6 @@ export type CommandWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.CommandWhereInput[]
   NOT?: Prisma.CommandWhereInput | Prisma.CommandWhereInput[]
   type?: Prisma.EnumProthesisTypeFilter<"Command"> | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFilter<"Command"> | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFilter<"Command"> | Date | string
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -401,7 +391,6 @@ export type CommandOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  subType?: Prisma.SortOrder
   dateIntervention?: Prisma.SortOrder
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -431,7 +420,6 @@ export type CommandScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Command"> | number
   reference?: Prisma.StringWithAggregatesFilter<"Command"> | string
   type?: Prisma.EnumProthesisTypeWithAggregatesFilter<"Command"> | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeWithAggregatesFilter<"Command"> | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeWithAggregatesFilter<"Command"> | Date | string
   dateLivraison?: Prisma.DateTimeWithAggregatesFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableWithAggregatesFilter<"Command"> | string | null
@@ -452,7 +440,6 @@ export type CommandScalarWhereWithAggregatesInput = {
 export type CommandCreateInput = {
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -476,7 +463,6 @@ export type CommandUncheckedCreateInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -499,7 +485,6 @@ export type CommandUncheckedCreateInput = {
 export type CommandUpdateInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -523,7 +508,6 @@ export type CommandUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -547,7 +531,6 @@ export type CommandCreateManyInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -568,7 +551,6 @@ export type CommandCreateManyInput = {
 export type CommandUpdateManyMutationInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -588,7 +570,6 @@ export type CommandUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -620,7 +601,6 @@ export type CommandCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  subType?: Prisma.SortOrder
   dateIntervention?: Prisma.SortOrder
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
@@ -648,7 +628,6 @@ export type CommandMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  subType?: Prisma.SortOrder
   dateIntervention?: Prisma.SortOrder
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
@@ -670,7 +649,6 @@ export type CommandMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  subType?: Prisma.SortOrder
   dateIntervention?: Prisma.SortOrder
   dateLivraison?: Prisma.SortOrder
   lienIntervention?: Prisma.SortOrder
@@ -787,10 +765,6 @@ export type EnumProthesisTypeFieldUpdateOperationsInput = {
   set?: $Enums.ProthesisType
 }
 
-export type EnumProthesisSubTypeFieldUpdateOperationsInput = {
-  set?: $Enums.ProthesisSubType
-}
-
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
@@ -846,7 +820,6 @@ export type CommandUpdateOneRequiredWithoutAttachmentsNestedInput = {
 export type CommandCreateWithoutCreatedByInput = {
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -869,7 +842,6 @@ export type CommandUncheckedCreateWithoutCreatedByInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -901,7 +873,6 @@ export type CommandCreateManyCreatedByInputEnvelope = {
 export type CommandCreateWithoutInstrumentisteInput = {
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -924,7 +895,6 @@ export type CommandUncheckedCreateWithoutInstrumentisteInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -976,7 +946,6 @@ export type CommandScalarWhereInput = {
   id?: Prisma.IntFilter<"Command"> | number
   reference?: Prisma.StringFilter<"Command"> | string
   type?: Prisma.EnumProthesisTypeFilter<"Command"> | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFilter<"Command"> | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFilter<"Command"> | Date | string
   dateLivraison?: Prisma.DateTimeFilter<"Command"> | Date | string
   lienIntervention?: Prisma.StringNullableFilter<"Command"> | string | null
@@ -1013,7 +982,6 @@ export type CommandUpdateManyWithWhereWithoutInstrumentisteInput = {
 export type CommandCreateWithoutCommandProductsInput = {
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1036,7 +1004,6 @@ export type CommandUncheckedCreateWithoutCommandProductsInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1074,7 +1041,6 @@ export type CommandUpdateToOneWithWhereWithoutCommandProductsInput = {
 export type CommandUpdateWithoutCommandProductsInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1097,7 +1063,6 @@ export type CommandUncheckedUpdateWithoutCommandProductsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1119,7 +1084,6 @@ export type CommandUncheckedUpdateWithoutCommandProductsInput = {
 export type CommandCreateWithoutAttachmentsInput = {
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1142,7 +1106,6 @@ export type CommandUncheckedCreateWithoutAttachmentsInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1180,7 +1143,6 @@ export type CommandUpdateToOneWithWhereWithoutAttachmentsInput = {
 export type CommandUpdateWithoutAttachmentsInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1203,7 +1165,6 @@ export type CommandUncheckedUpdateWithoutAttachmentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1226,7 +1187,6 @@ export type CommandCreateManyCreatedByInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1247,7 +1207,6 @@ export type CommandCreateManyInstrumentisteInput = {
   id?: number
   reference: string
   type: $Enums.ProthesisType
-  subType: $Enums.ProthesisSubType
   dateIntervention: Date | string
   dateLivraison: Date | string
   lienIntervention?: string | null
@@ -1267,7 +1226,6 @@ export type CommandCreateManyInstrumentisteInput = {
 export type CommandUpdateWithoutCreatedByInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1290,7 +1248,6 @@ export type CommandUncheckedUpdateWithoutCreatedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1313,7 +1270,6 @@ export type CommandUncheckedUpdateManyWithoutCreatedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1333,7 +1289,6 @@ export type CommandUncheckedUpdateManyWithoutCreatedByInput = {
 export type CommandUpdateWithoutInstrumentisteInput = {
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1356,7 +1311,6 @@ export type CommandUncheckedUpdateWithoutInstrumentisteInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1379,7 +1333,6 @@ export type CommandUncheckedUpdateManyWithoutInstrumentisteInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   reference?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumProthesisTypeFieldUpdateOperationsInput | $Enums.ProthesisType
-  subType?: Prisma.EnumProthesisSubTypeFieldUpdateOperationsInput | $Enums.ProthesisSubType
   dateIntervention?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dateLivraison?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lienIntervention?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1440,7 +1393,6 @@ export type CommandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   reference?: boolean
   type?: boolean
-  subType?: boolean
   dateIntervention?: boolean
   dateLivraison?: boolean
   lienIntervention?: boolean
@@ -1467,7 +1419,6 @@ export type CommandSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   reference?: boolean
   type?: boolean
-  subType?: boolean
   dateIntervention?: boolean
   dateLivraison?: boolean
   lienIntervention?: boolean
@@ -1491,7 +1442,6 @@ export type CommandSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   reference?: boolean
   type?: boolean
-  subType?: boolean
   dateIntervention?: boolean
   dateLivraison?: boolean
   lienIntervention?: boolean
@@ -1515,7 +1465,6 @@ export type CommandSelectScalar = {
   id?: boolean
   reference?: boolean
   type?: boolean
-  subType?: boolean
   dateIntervention?: boolean
   dateLivraison?: boolean
   lienIntervention?: boolean
@@ -1533,7 +1482,7 @@ export type CommandSelectScalar = {
   updatedAt?: boolean
 }
 
-export type CommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reference" | "type" | "subType" | "dateIntervention" | "dateLivraison" | "lienIntervention" | "ville" | "address" | "clinique" | "doctorName" | "modePaiement" | "status" | "commentaire" | "completionReport" | "instrumentisteId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["command"]>
+export type CommandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reference" | "type" | "dateIntervention" | "dateLivraison" | "lienIntervention" | "ville" | "address" | "clinique" | "doctorName" | "modePaiement" | "status" | "commentaire" | "completionReport" | "instrumentisteId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["command"]>
 export type CommandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attachments?: boolean | Prisma.Command$attachmentsArgs<ExtArgs>
   instrumentiste?: boolean | Prisma.Command$instrumentisteArgs<ExtArgs>
@@ -1562,7 +1511,6 @@ export type $CommandPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: number
     reference: string
     type: $Enums.ProthesisType
-    subType: $Enums.ProthesisSubType
     dateIntervention: Date
     dateLivraison: Date
     lienIntervention: string | null
@@ -2008,7 +1956,6 @@ export interface CommandFieldRefs {
   readonly id: Prisma.FieldRef<"Command", 'Int'>
   readonly reference: Prisma.FieldRef<"Command", 'String'>
   readonly type: Prisma.FieldRef<"Command", 'ProthesisType'>
-  readonly subType: Prisma.FieldRef<"Command", 'ProthesisSubType'>
   readonly dateIntervention: Prisma.FieldRef<"Command", 'DateTime'>
   readonly dateLivraison: Prisma.FieldRef<"Command", 'DateTime'>
   readonly lienIntervention: Prisma.FieldRef<"Command", 'String'>

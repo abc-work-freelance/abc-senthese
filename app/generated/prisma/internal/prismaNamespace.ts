@@ -909,7 +909,6 @@ export const CommandScalarFieldEnum = {
   id: 'id',
   reference: 'reference',
   type: 'type',
-  subType: 'subType',
   dateIntervention: 'dateIntervention',
   dateLivraison: 'dateLivraison',
   lienIntervention: 'lienIntervention',
@@ -1068,20 +1067,6 @@ export type EnumProthesisTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'ProthesisType[]'
  */
 export type ListEnumProthesisTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProthesisType[]'>
-    
-
-
-/**
- * Reference to a field of type 'ProthesisSubType'
- */
-export type EnumProthesisSubTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProthesisSubType'>
-    
-
-
-/**
- * Reference to a field of type 'ProthesisSubType[]'
- */
-export type ListEnumProthesisSubTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProthesisSubType[]'>
     
 
 

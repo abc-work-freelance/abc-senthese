@@ -92,7 +92,6 @@ export const CommandScalarFieldEnum = {
   id: 'id',
   reference: 'reference',
   type: 'type',
-  subType: 'subType',
   dateIntervention: 'dateIntervention',
   dateLivraison: 'dateLivraison',
   lienIntervention: 'lienIntervention',

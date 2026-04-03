@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { ProthesisType, ProthesisSubType, PaymentMode, CommandStatus } from "@/app/generated/prisma/client"
+import { ProthesisType, PaymentMode, CommandStatus } from "@/app/generated/prisma/client"
 import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
 import { broadcastEntityChange } from "@/lib/ws-notify"
@@ -16,7 +16,6 @@ export type CommandProductInput = {
 export type CreateCommandInput = {
   reference: string
   type: ProthesisType
-  subType: ProthesisSubType
   dateIntervention: Date
   dateLivraison: Date
   lienIntervention?: string

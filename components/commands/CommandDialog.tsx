@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon, Plus, Trash2 } from "lucide-react"
 import { createCommand, updateCommand } from "@/app/actions/commands"
-import { ProthesisType, ProthesisSubType, PaymentMode, Product, User, Command } from "@/app/generated/prisma/browser"
+import { ProthesisType, PaymentMode, Product, User, Command } from "@/app/generated/prisma/browser"
 
 // Define the shape of the command with its relations as expected by the dialog
 type CommandWithRelations = Command & {
@@ -65,7 +65,6 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
     defaultValues: {
       reference: command?.reference || "",
       type: command?.type || ProthesisType.KNEE,
-      subType: command?.subType || ProthesisSubType.PTG_ZIMED,
       dateIntervention: command?.dateIntervention ? new Date(command.dateIntervention) : new Date(),
       dateLivraison: command?.dateLivraison ? new Date(command.dateLivraison) : new Date(),
       lienIntervention: command?.lienIntervention || "",
@@ -215,30 +214,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     </FormItem>
                 )}
                 />
-                <FormField
-                control={form.control}
-                name="subType"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Sub Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select sub type" />
-                        </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                        {Object.values(ProthesisSubType).map((type) => (
-                            <SelectItem key={type} value={type}>
-                            {type}
-                            </SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
+
             </div>
 
             <div className="grid grid-cols-2 gap-4">

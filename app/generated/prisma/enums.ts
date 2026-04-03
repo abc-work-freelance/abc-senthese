@@ -26,18 +26,6 @@ export const ProthesisType = {
 export type ProthesisType = (typeof ProthesisType)[keyof typeof ProthesisType]
 
 
-export const ProthesisSubType = {
-  PIH_ZIMED: 'PIH_ZIMED',
-  PTH_OTIMED: 'PTH_OTIMED',
-  PTG_ZIMED: 'PTG_ZIMED',
-  PTG_PERMIDCA: 'PTG_PERMIDCA',
-  PTE_INVERSEE: 'PTE_INVERSEE',
-  PTE_ANATOMIQUE: 'PTE_ANATOMIQUE'
-} as const
-
-export type ProthesisSubType = (typeof ProthesisSubType)[keyof typeof ProthesisSubType]
-
-
 export const PaymentMode = {
   CASH: 'CASH',
   VIREMENT: 'VIREMENT',

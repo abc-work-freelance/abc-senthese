@@ -11,10 +11,10 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { 
-  LayoutDashboard, 
-  Package, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Package,
+  Settings,
   LogOut,
   FileText,
   ShieldCheck
@@ -34,10 +34,10 @@ export async function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                AB
-            </div>
-            <span className="font-semibold text-lg truncate">ABC App</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+            AB
+          </div>
+          <span className="font-semibold text-lg truncate">ABC App</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -56,14 +56,6 @@ export async function AppSidebar() {
 
               {role === UserRole.ADMIN && (
                 <>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="Commands">
-                      <Link href="/dashboard">
-                        <FileText />
-                        <span>Commands</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Products">
                       <Link href="/dashboard/products">
@@ -88,12 +80,12 @@ export async function AppSidebar() {
 
               {role === UserRole.INSTRUMENTISTE && (
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="My Commands">
-                      <Link href="/dashboard">
-                        <FileText />
-                        <span>My Commands</span>
-                      </Link>
-                    </SidebarMenuButton>
+                  <SidebarMenuButton asChild tooltip="My Commands">
+                    <Link href="/dashboard">
+                      <FileText />
+                      <span>My Commands</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
             </SidebarMenu>
@@ -103,12 +95,12 @@ export async function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-             <SidebarMenuButton asChild tooltip="Sign Out">
-                <LogoutModal>
-                    <LogOut />
-                    <span>Sign Out</span>
-                </LogoutModal>
-             </SidebarMenuButton>
+            <SidebarMenuButton asChild tooltip="Sign Out">
+              <LogoutModal>
+                <LogOut />
+                <span>Sign Out</span>
+              </LogoutModal>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

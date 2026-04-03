@@ -1,10 +1,9 @@
 import { z } from "zod"
-import { ProthesisType, ProthesisSubType, PaymentMode } from "@/app/generated/prisma/browser"
+import { ProthesisType, PaymentMode } from "@/app/generated/prisma/browser"
 
 export const commandSchema = z.object({
   reference: z.string().min(1, "Reference is required"),
   type: z.nativeEnum(ProthesisType),
-  subType: z.nativeEnum(ProthesisSubType),
   dateIntervention: z.date(),
   dateLivraison: z.date(),
   lienIntervention: z.string().optional(),
