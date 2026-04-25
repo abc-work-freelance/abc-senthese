@@ -7,6 +7,9 @@ import { ProthesisType, PaymentMode, CommandStatus } from "@/app/generated/prism
 import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
 import { broadcastEntityChange } from "@/lib/ws-notify"
+import { mkdir, writeFile } from "node:fs/promises"
+import path from "node:path"
+import { randomUUID } from "node:crypto"
 
 export type CommandProductInput = {
   productId: number
@@ -189,9 +192,28 @@ export async function deleteCommand(id: number) {
 
 export async function updateCommandStatus(id: number, status: CommandStatus) {
   try {
-    const perm = await requirePermission("COMMAND_STATUS_UPDATE")
-    if (!perm.ok) {
-      return { success: false, message: perm.message }
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" }
+    }
+
+    const userId = Number(session.user.id)
+    const role = session.user.role
+
+    if (role === "ADMIN") {
+      const perm = await requirePermission("COMMAND_STATUS_UPDATE")
+      if (!perm.ok) {
+        return { success: false, message: perm.message }
+      }
+    } else {
+      const command = await prisma.command.findUnique({
+        where: { id },
+        select: { instrumentisteId: true },
+      })
+
+      if (!command || command.instrumentisteId !== userId) {
+        return { success: false, message: "Forbidden" }
+      }
     }
 
     const command = await prisma.command.update({
@@ -207,10 +229,97 @@ export async function updateCommandStatus(id: number, status: CommandStatus) {
 
     revalidatePath(`/commands/${id}`)
     revalidatePath("/commands")
+    revalidatePath("/dashboard")
     return { success: true, command }
   } catch (error) {
     console.error("Update status error:", error)
     return { success: false, message: "Failed to update status" }
+  }
+}
+
+export async function uploadCommandCompletionReport(id: number, formData: FormData) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" }
+    }
+
+    const userId = Number(session.user.id)
+    const role = session.user.role
+
+    const command = await prisma.command.findUnique({
+      where: { id },
+      select: { id: true, status: true, instrumentisteId: true },
+    })
+
+    if (!command) {
+      return { success: false, message: "Command not found" }
+    }
+
+    if (command.status !== CommandStatus.COMPLETEE) {
+      return { success: false, message: "File upload is allowed only when command status is COMPLETEE." }
+    }
+
+    if (role !== "ADMIN" && command.instrumentisteId !== userId) {
+      return { success: false, message: "Forbidden" }
+    }
+
+    const file = formData.get("file")
+    if (!(file instanceof File)) {
+      return { success: false, message: "No file provided." }
+    }
+
+    if (file.size === 0) {
+      return { success: false, message: "Uploaded file is empty." }
+    }
+
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) {
+      return { success: false, message: "File is too large. Maximum allowed size is 10MB." }
+    }
+
+    const ext = path.extname(file.name || "").toLowerCase()
+    const allowedExt = new Set([".pdf", ".png", ".jpg", ".jpeg", ".doc", ".docx"])
+
+    if (!allowedExt.has(ext)) {
+      return { success: false, message: "Unsupported file type. Allowed: PDF, PNG, JPG, DOC, DOCX." }
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const uniqueName = `${id}-${randomUUID()}${ext}`
+    const relativePath = `/uploads/commands/${uniqueName}`
+    const targetDir = path.join(process.cwd(), "public", "uploads", "commands")
+    const targetPath = path.join(targetDir, uniqueName)
+
+    await mkdir(targetDir, { recursive: true })
+    await writeFile(targetPath, buffer)
+
+    await prisma.command.update({
+      where: { id },
+      data: {
+        completionReport: relativePath,
+        attachments: {
+          create: {
+            url: relativePath,
+            name: file.name,
+          },
+        },
+      },
+    })
+
+    broadcastEntityChange({
+      entity: "command",
+      action: "updated",
+      id,
+    })
+
+    revalidatePath("/dashboard")
+    revalidatePath("/commands")
+
+    return { success: true, message: "File uploaded successfully." }
+  } catch (error) {
+    console.error("Upload completion report error:", error)
+    return { success: false, message: "Failed to upload file." }
   }
 }
 

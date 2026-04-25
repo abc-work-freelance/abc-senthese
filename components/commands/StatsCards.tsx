@@ -1,41 +1,8 @@
-// import React from 'react'
-// import { Card } from '@/components/ui/card'
-
-// interface StatCardProps {
-//   title: string
-//   value: string | number
-//   change: number
-//   icon: React.ReactNode
-// }
-
-// export function StatCard({ title, value, change, icon }: StatCardProps) {
-//   const isPositive = change >= 0
-  
-//   return (
-//     <Card className="p-6">
-//       <div className="flex items-start justify-between">
-//         <div className="flex-1">
-//           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-//           <h3 className="mt-2 text-2xl font-bold">{value}</h3>
-//           <p className={`mt-1 text-sm font-medium ${
-//             isPositive ? 'text-green-600' : 'text-red-600'
-//           }`}>
-//             {isPositive ? '+' : ''}{change}% from last month
-//           </p>
-//         </div>
-//         <div className="text-3xl text-muted-foreground opacity-50">
-//           {icon}
-//         </div>
-//       </div>
-//     </Card>
-//   )
-// }
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { motion, Variants } from 'framer-motion'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 interface StatCardProps {
   title: string
@@ -43,167 +10,94 @@ interface StatCardProps {
   change: number
   icon: React.ReactNode
   delay?: number
+  accent: string
+  iconBackground: string
+  iconColor: string
+  progress: number
 }
 
-export function StatCard({ title, value, change, icon, delay = 0 }: StatCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+export function StatCard({
+  title,
+  value,
+  change,
+  icon,
+  accent,
+  iconBackground,
+  iconColor,
+  progress,
+}: StatCardProps) {
+  const [displayValue, setDisplayValue] = useState(0)
+
+  const targetValue = typeof value === 'number' ? value : Number(value) || 0
+
+  useEffect(() => {
+    let frame = 0
+    const startTime = performance.now()
+    const duration = 900
+
+    const step = (time: number) => {
+      const elapsed = time - startTime
+      const nextValue = Math.min(elapsed / duration, 1)
+      setDisplayValue(Math.round(targetValue * nextValue))
+
+      if (nextValue < 1) {
+        frame = requestAnimationFrame(step)
+      }
+    }
+
+    frame = requestAnimationFrame(step)
+
+    return () => cancelAnimationFrame(frame)
+  }, [targetValue])
+
   const isPositive = change >= 0
-  
-  const containerVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        delay,
-        ease: [0.34, 1.56, 0.64, 1],
-      },
-    },
-  }
-
-  const iconVariants: Variants = {
-    initial: { scale: 1, rotate: 0 },
-    hover: {
-      scale: 1.2,
-      rotate: 12,
-      transition: {
-        type: 'spring',
-        stiffness: 400,
-        damping: 10,
-      },
-    },
-  }
-
-  const valueVariants: Variants = {
-    initial: { scale: 1 },
-    hover: {
-      scale: 1.08,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 15,
-      },
-    },
-  }
-
-  const trendVariants = {
-    initial: { x: 0, opacity: 0.7 },
-    hover: {
-      x: 4,
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-      },
-    },
-  }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+    <Card
+      className="group relative overflow-hidden border-[#E8ECF0] bg-white p-5 shadow-none transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)]"
+      style={{ borderRadius: '14px' }}
     >
-      <Card className="relative overflow-hidden p-6 transition-colors duration-300 hover:bg-accent/50">
-        {/* Animated gradient background on hover */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
-        />
+      <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundImage: accent }} />
 
-        {/* Glowing orb effect */}
-        <motion.div
-          className="absolute -top-8 -right-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"
-          animate={{
-            x: isHovered ? -10 : 0,
-            y: isHovered ? -10 : 0,
-            scale: isHovered ? 1.2 : 1,
-          }}
-          transition={{ duration: 0.4 }}
-        />
-
-        <div className="relative z-10 flex items-start justify-between">
-          <div className="flex-1">
-            <motion.p
-              className="text-sm font-medium text-muted-foreground uppercase tracking-wide"
-              animate={{ letterSpacing: isHovered ? '0.05em' : '0em' }}
-              transition={{ duration: 0.3 }}
-            >
-              {title}
-            </motion.p>
-
-            <motion.h3
-              className="mt-2 text-4xl font-bold text-foreground"
-              variants={valueVariants}
-              initial="initial"
-              animate={isHovered ? 'hover' : 'initial'}
-            >
-              {value}
-            </motion.h3>
-
-            <motion.div
-              className="mt-3 flex items-center gap-1"
-              variants={trendVariants}
-              initial="initial"
-              animate={isHovered ? 'hover' : 'initial'}
-            >
-              <span
-                className={`text-sm font-semibold flex items-center gap-1 ${
-                  isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                }`}
-              >
-                {isPositive ? (
-                  <>
-                    <motion.span
-                      animate={isHovered ? { rotate: 360, y: -2 } : { rotate: 0, y: 0 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      <TrendingUp size={16} />
-                    </motion.span>
-                    +{change}%
-                  </>
-                ) : (
-                  <>
-                    <motion.span
-                      animate={isHovered ? { rotate: 360, y: 2 } : { rotate: 0, y: 0 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      <TrendingDown size={16} />
-                    </motion.span>
-                    {change}%
-                  </>
-                )}
-              </span>
-              <span className="text-xs text-muted-foreground">from last month</span>
-            </motion.div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#94A3B8]">
+            {title}
+          </div>
+          <div className="mt-2 text-[28px] font-semibold leading-none text-[#1A2332]">
+            {displayValue.toLocaleString()}
           </div>
 
-          <motion.div
-            className="text-5xl opacity-70"
-            variants={iconVariants}
-            initial="initial"
-            animate={isHovered ? 'hover' : 'initial'}
-          >
-            {icon}
-          </motion.div>
+          <div className="mt-3 flex items-center gap-2 text-sm font-medium">
+            {isPositive ? (
+              <ArrowUpRight className="h-4 w-4 text-[#10B981]" />
+            ) : (
+              <ArrowDownRight className="h-4 w-4 text-[#EF4444]" />
+            )}
+            <span style={{ color: isPositive ? '#10B981' : '#EF4444' }}>
+              {isPositive ? '+' : ''}{change}%
+            </span>
+            <span className="text-[#94A3B8]">from last month</span>
+          </div>
         </div>
 
-        {/* Border glow on hover */}
-        <motion.div
-          className="absolute inset-0 rounded-lg border border-primary/20 pointer-events-none"
-          animate={{
-            borderColor: isHovered ? 'rgba(var(--primary), 0.4)' : 'rgba(var(--primary), 0.1)',
-            boxShadow: isHovered
-              ? '0 0 20px rgba(var(--primary), 0.1)'
-              : '0 0 0px rgba(var(--primary), 0)',
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-lg"
+          style={{ backgroundColor: iconBackground, color: iconColor }}
+        >
+          {icon}
+        </div>
+      </div>
+
+      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#EEF2F6]">
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${Math.min(Math.max(progress, 8), 100)}%`,
+            backgroundImage: accent,
           }}
-          transition={{ duration: 0.3 }}
         />
-      </Card>
-    </motion.div>
+      </div>
+    </Card>
   )
 }

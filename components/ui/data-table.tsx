@@ -75,8 +75,8 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4 gap-2">
+    <div className="w-full rounded-xl border border-[#E8ECF0] bg-white p-4 shadow-[0_18px_40px_rgba(13,27,46,0.05)]">
+      <div className="flex items-center gap-2 py-2">
         {searchKey && (
           <Input
             placeholder={searchPlaceholder}
@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="mt-3 rounded-xl border border-[#E8ECF0] overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

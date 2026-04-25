@@ -31,7 +31,7 @@ export function DeleteCommandDialog({ id }: DeleteCommandDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md text-red-500 transition-colors hover:bg-[#EBF9F5] hover:text-[#0D7B5F]">
           <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>

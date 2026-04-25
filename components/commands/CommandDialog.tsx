@@ -46,7 +46,11 @@ type CommandWithRelations = Command & {
     product?: Product // Optional because we might just have the ID in some contexts, but usually we need it for display? 
                       // actually for the form default values we just need productId and quantity.
   }[]
-  instrumentiste?: any // Relaxed type as we don't use this relation in the dialog, and it varies (list vs detail)
+  instrumentiste?: {
+    id?: number
+    name?: string | null
+    familyName?: string | null
+  } | null
 }
 
 interface CommandDialogProps {
@@ -105,15 +109,23 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button>
+          <Button
+            style={{
+              backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
+              boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
+              borderRadius: '10px',
+              color: '#FFFFFF',
+            }}
+            className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
+          >
             <Plus className="mr-2 h-4 w-4" /> Create Command
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto" style={{ borderRadius: '16px' }}>
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Command" : "Create Command"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle style={{ fontFamily: 'var(--font-dm-serif)', fontSize: '26px', color: '#1A2332' }}>{isEditing ? "Edit Command" : "Create Command"}</DialogTitle>
+          <DialogDescription style={{ color: '#94A3B8', fontSize: '13px' }}>
             {isEditing
               ? "Update command details."
               : "Create a new command."}
@@ -196,9 +208,9 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                        <SelectTrigger>
+                    <SelectTrigger>
                             <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         </FormControl>
@@ -229,10 +241,11 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                             <FormControl>
                                 <Button
                                 variant={"outline"}
-                                className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                )}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            style={{ borderRadius: '10px', borderColor: '#E8ECF0', backgroundColor: '#FFFFFF' }}
                                 >
                                 {field.value ? (
                                     format(field.value, "PPP")
@@ -274,6 +287,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                                     "w-full pl-3 text-left font-normal",
                                     !field.value && "text-muted-foreground"
                                 )}
+                            style={{ borderRadius: '10px', borderColor: '#E8ECF0', backgroundColor: '#FFFFFF' }}
                                 >
                                 {field.value ? (
                                     format(field.value, "PPP")
@@ -310,7 +324,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     <FormLabel>Payment Mode</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                        <SelectTrigger>
+                      <SelectTrigger>
                             <SelectValue placeholder="Select payment mode" />
                         </SelectTrigger>
                         </FormControl>
@@ -335,7 +349,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     <FormLabel>Instrumentiste</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                         <FormControl>
-                        <SelectTrigger>
+                      <SelectTrigger>
                             <SelectValue placeholder="Select instrumentiste" />
                         </SelectTrigger>
                         </FormControl>
@@ -357,8 +371,9 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     <FormLabel>Products</FormLabel>
                     <Button
                         type="button"
-                        variant="outline"
+                      variant="outline"
                         size="sm"
+                      style={{ borderRadius: '10px', borderColor: '#E8ECF0' }}
                         onClick={() => append({ productId: productsList[0]?.id || 0, quantity: 1 })}
                     >
                         Add Product
@@ -439,7 +454,18 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
             />
 
             <DialogFooter>
-              <Button type="submit">Save Command</Button>
+              <Button
+                type="submit"
+                style={{
+                  backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
+                  boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
+                  borderRadius: '10px',
+                  color: '#FFFFFF',
+                }}
+                className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
+              >
+                Save Command
+              </Button>
             </DialogFooter>
           </form>
         </Form>
