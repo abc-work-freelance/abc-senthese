@@ -10,15 +10,25 @@ import { Button } from "@/components/ui/button"
 import { SquarePen, Activity, Link2 } from "lucide-react"
 import { format } from "date-fns"
 
-type CommandWithRelations = Command & {
-    commandProducts: {
-        product: Product
-        quantity: number
-    }[]
-    instrumentiste?: {
-        name: string | null
-        familyName: string | null
-    } | null
+type CommandRow = {
+  id: number
+  reference: string
+  type: ProthesisType
+  dateIntervention: string | Date
+  ville?: string | null
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
+  status: CommandStatus
+  completionReport?: string | null
+  commandProducts: {
+    product: Product
+    quantity: number
+  }[]
+  instrumentiste?: {
+    name: string | null
+    familyName: string | null
+  } | null
 }
 
 interface CommandColumnsProps {
@@ -41,7 +51,7 @@ const statusStyles: Record<CommandStatus, string> = {
   ANNULEE: '#EF4444',
 }
 
-export const getColumns = ({ productsList, usersList, isAdmin }: CommandColumnsProps): ColumnDef<CommandWithRelations>[] => [
+export const getColumns = ({ productsList, usersList, isAdmin }: CommandColumnsProps): ColumnDef<CommandRow>[] => [
   {
     accessorKey: "reference",
     header: () => <span>Reference</span>,

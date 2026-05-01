@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { MobileSidebarButton } from "@/components/mobile-sidebar-button"
 import { Providers } from "@/components/Providers"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
@@ -44,6 +45,7 @@ export default async function DashboardLayout({
             >
               <div className="flex w-full items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
+                  <MobileSidebarButton role={role} email={email} />
                   <Link href="/dashboard" className="flex items-center gap-3">
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-lg shadow-[0_8px_18px_rgba(0,196,154,0.25)]"

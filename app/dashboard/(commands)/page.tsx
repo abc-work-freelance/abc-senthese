@@ -18,11 +18,25 @@ type DashboardCommand = {
   type: "HIP" | "KNEE" | "SHOULDER"
   status: "VALIDEE" | "AFFECTEE" | "REPORTEE" | "ANNULEE" | "COMPLETEE"
   dateIntervention: Date | string
+  dateLivraison: Date | string
+  lienIntervention?: string | null
   updatedAt: Date | string
   ville?: string | null
+  address?: string | null
   doctorName?: string | null
   clinique?: string | null
   instrumentisteId?: number | null
+  completionReport?: string | null
+  modePaiement?: string | null
+  commentaire?: string | null
+  commandProducts: {
+    product: { id: number; name: string; code: string }
+    quantity: number
+  }[]
+  instrumentiste?: {
+    name: string | null
+    familyName: string | null
+  } | null
 }
 
 export default async function CommandsPage() {
@@ -37,10 +51,11 @@ export default async function CommandsPage() {
       commands = res.commands as DashboardCommand[]
   } else if (role === UserRole.INSTRUMENTISTE && userId) {
      const res = await getAllCommands()
+      const allowedStatuses = [CommandStatus.AFFECTEE, CommandStatus.COMPLETEE, CommandStatus.ANNULEE] as const
       commands = (res.commands as DashboardCommand[] | undefined)?.filter(
         (command) =>
           command.instrumentisteId === parseInt(userId) &&
-          [CommandStatus.AFFECTEE, CommandStatus.COMPLETEE, CommandStatus.ANNULEE].includes(command.status)
+          allowedStatuses.includes(command.status as any)
       ) || []
   }
 

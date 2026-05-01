@@ -10,12 +10,17 @@ type CommandRow = {
   reference: string
   type: ProthesisType
   dateIntervention: string | Date
+  dateLivraison: string | Date
+  lienIntervention?: string | null
   ville?: string | null
   address?: string | null
   clinique?: string | null
   doctorName?: string | null
   status: CommandStatus
   completionReport?: string | null
+  modePaiement?: string | null
+  commentaire?: string | null
+  instrumentisteId?: number | null
   commandProducts: {
     product: Product
     quantity: number

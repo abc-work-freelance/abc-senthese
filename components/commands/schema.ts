@@ -13,7 +13,7 @@ export const commandSchema = z.object({
   doctorName: z.string().optional(),
   modePaiement: z.nativeEnum(PaymentMode),
   commentaire: z.string().optional(),
-  instrumentisteId: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  instrumentisteId: z.string().optional(),
   // For now, simple product selection might be complex, we can add it later or as a separate step
   // But let's add a basic structure for products if needed
   products: z.array(z.object({

@@ -39,12 +39,24 @@ import { createCommand, updateCommand } from "@/app/actions/commands"
 import { ProthesisType, PaymentMode, Product, User, Command } from "@/app/generated/prisma/browser"
 
 // Define the shape of the command with its relations as expected by the dialog
-type CommandWithRelations = Command & {
-  commandProducts: {
-    productId: number
+type CommandDialogData = {
+  id?: number
+  reference?: string
+  type?: string
+  dateIntervention?: Date | string
+  dateLivraison?: Date | string
+  lienIntervention?: string | null
+  ville?: string | null
+  address?: string | null
+  clinique?: string | null
+  doctorName?: string | null
+  modePaiement?: string
+  commentaire?: string | null
+  instrumentisteId?: number | null
+  commandProducts?: {
+    productId?: number
     quantity: number
-    product?: Product // Optional because we might just have the ID in some contexts, but usually we need it for display? 
-                      // actually for the form default values we just need productId and quantity.
+    product?: any
   }[]
   instrumentiste?: {
     id?: number
@@ -54,7 +66,7 @@ type CommandWithRelations = Command & {
 }
 
 interface CommandDialogProps {
-  command?: CommandWithRelations
+  command?: CommandDialogData
   trigger?: React.ReactNode
   productsList: Product[]
   usersList: User[] // Pass users to select instrumentiste
@@ -68,7 +80,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
     resolver: zodResolver(commandSchema),
     defaultValues: {
       reference: command?.reference || "",
-      type: command?.type || ProthesisType.KNEE,
+      type: (command?.type as any) || ProthesisType.KNEE,
       dateIntervention: command?.dateIntervention ? new Date(command.dateIntervention) : new Date(),
       dateLivraison: command?.dateLivraison ? new Date(command.dateLivraison) : new Date(),
       lienIntervention: command?.lienIntervention || "",
@@ -76,11 +88,11 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
       address: command?.address || "",
       clinique: command?.clinique || "",
       doctorName: command?.doctorName || "",
-      modePaiement: command?.modePaiement || PaymentMode.CASH,
+      modePaiement: (command?.modePaiement as any) || PaymentMode.CASH,
       commentaire: command?.commentaire || "",
       instrumentisteId: command?.instrumentisteId?.toString() || undefined,
       products: command?.commandProducts?.map((cp) => ({
-        productId: cp.productId,
+        productId: (cp as any).productId || (cp.product?.id),
         quantity: cp.quantity
       })) || []
     },
@@ -93,10 +105,15 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
 
   const onSubmit = async (data: CommandFormValues) => {
     try {
-      if (isEditing && command) {
-        await updateCommand(command.id, data)
+      // Convert instrumentisteId from string to number if present
+      const submitData = {
+        ...data,
+        instrumentisteId: data.instrumentisteId ? parseInt(data.instrumentisteId) : undefined
+      }
+      if (isEditing && command && command.id) {
+        await updateCommand(command.id, submitData as any)
       } else {
-        await createCommand(data)
+        await createCommand(submitData as any)
       }
       setOpen(false)
       form.reset()
@@ -347,7 +364,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Instrumentiste</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value ? field.value.toString() : ""}>
                         <FormControl>
                       <SelectTrigger>
                             <SelectValue placeholder="Select instrumentiste" />
@@ -389,7 +406,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                                 <FormLabel className={index !== 0 ? "sr-only" : ""}>Product</FormLabel>
                                 <Select 
                                     onValueChange={(value) => field.onChange(parseInt(value))} 
-                                    defaultValue={field.value.toString()}
+                                    defaultValue={field.value ? field.value.toString() : ""}
                                 >
                                     <FormControl>
                                     <SelectTrigger>
