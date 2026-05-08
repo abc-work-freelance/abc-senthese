@@ -6,7 +6,8 @@ import {
   Settings,
   LogOut,
   FileText,
-  ShieldCheck
+  ShieldCheck,
+  UserCheck
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -17,6 +18,7 @@ type SidebarRole = "ADMIN" | "INSTRUMENTISTE"
 interface AppSidebarContentProps {
   role?: SidebarRole | null
   email?: string | null
+  isSuperAdmin?: boolean
   onNavigate?: () => void
 }
 
@@ -74,7 +76,7 @@ function SidebarLink({
   )
 }
 
-export function AppSidebarContent({ role, email, onNavigate }: AppSidebarContentProps) {
+export function AppSidebarContent({ role, email, isSuperAdmin, onNavigate }: AppSidebarContentProps) {
   const pathname = usePathname()
 
   return (
@@ -124,6 +126,9 @@ export function AppSidebarContent({ role, email, onNavigate }: AppSidebarContent
             <div className="space-y-1">
               {/* <SidebarLink label="Team" icon={FileText} /> */}
               <SidebarLink href="/dashboard/permissions" label="Permissions" icon={ShieldCheck} active={pathname === "/dashboard/permissions"} onNavigate={onNavigate} />
+              {isSuperAdmin && (
+                <SidebarLink href="/dashboard/approvals" label="Approvals" icon={UserCheck} active={pathname === "/dashboard/approvals"} onNavigate={onNavigate} />
+              )}
             </div>
           </div>
         )}

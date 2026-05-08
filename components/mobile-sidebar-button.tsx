@@ -13,9 +13,10 @@ import { AppSidebarContent } from "./app-sidebar-content"
 interface MobileSidebarButtonProps {
   role?: "ADMIN" | "INSTRUMENTISTE" | null
   email?: string | null
+  isSuperAdmin?: boolean
 }
 
-export function MobileSidebarButton({ role, email }: MobileSidebarButtonProps) {
+export function MobileSidebarButton({ role, email, isSuperAdmin }: MobileSidebarButtonProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -35,7 +36,7 @@ export function MobileSidebarButton({ role, email }: MobileSidebarButtonProps) {
             <SheetTitle>ABC SYNTHESE</SheetTitle>
           </SheetHeader>
           <div className="overflow-y-auto h-full">
-            <AppSidebarContent role={role} email={email} onNavigate={() => setOpen(false)} />
+            <AppSidebarContent role={role} email={email} isSuperAdmin={isSuperAdmin} onNavigate={() => setOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>

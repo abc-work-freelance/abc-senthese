@@ -37,6 +37,10 @@ export async function POST(req: Request) {
 
     const hashedPassword = await hash(password, 10)
 
+    // Super admin (EMAILADMIN) self-approves; everyone else waits for approval.
+    const isSuperAdmin =
+      !!process.env.EMAILADMIN && email === process.env.EMAILADMIN
+
     const user = await prisma.user.create({
       data: {
         name,
@@ -44,6 +48,7 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role,
+        approved: isSuperAdmin,
       },
     })
 

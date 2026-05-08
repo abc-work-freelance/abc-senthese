@@ -65,6 +65,10 @@ model User {
   // Fine-grained permissions for admins
   permissions Permission[] @default([])
 
+  // Account approval gate. New accounts must be approved by the super admin
+  // (matching EMAILADMIN env var) before they can access dashboard data.
+  approved    Boolean      @default(false)
+
   // Relations
   createdCommands  Command[] @relation("CreatedByAdmin")
   assignedCommands Command[] @relation("AssignedToInstrumentiste")

@@ -4,7 +4,7 @@ import { Providers } from "@/components/Providers"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import Link from "next/link"
-import { Bell, CalendarDays, ChevronDown, LayoutDashboard, Package, Search, ShieldCheck } from "lucide-react"
+import { Bell, CalendarDays, ChevronDown, LayoutDashboard, Package, Search, ShieldCheck, UserCheck } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { UserRole } from "@/app/generated/prisma/client"
 
@@ -31,12 +31,13 @@ export default async function DashboardLayout({
   const name = session?.user?.name
   const email = session?.user?.email
   const initials = getInitials(name, email)
+  const isSuperAdmin = !!process.env.EMAILADMIN && email === process.env.EMAILADMIN
 
   return (
     <Providers>
       <div className="min-h-screen" style={{ backgroundColor: "var(--med-surface)" }}>
         <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <AppSidebar role={role} email={email} />
+          <AppSidebar role={role} email={email} isSuperAdmin={isSuperAdmin} />
 
           <div className="min-w-0">
             <header
@@ -45,7 +46,7 @@ export default async function DashboardLayout({
             >
               <div className="flex w-full items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <MobileSidebarButton role={role} email={email} />
+                  <MobileSidebarButton role={role} email={email} isSuperAdmin={isSuperAdmin} />
                   <Link href="/dashboard" className="flex items-center gap-3">
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-lg shadow-[0_8px_18px_rgba(0,196,154,0.25)]"
@@ -74,6 +75,9 @@ export default async function DashboardLayout({
                       { href: "/dashboard#commands", label: "Commands", icon: CalendarDays },
                       { href: "/dashboard/products", label: "Products", icon: Package },
                       { href: "/dashboard/permissions", label: "Permissions", icon: ShieldCheck },
+                      ...(isSuperAdmin
+                        ? [{ href: "/dashboard/approvals", label: "Approvals", icon: UserCheck }]
+                        : []),
                     ].map((item) => {
                       const Icon = item.icon
                       return (

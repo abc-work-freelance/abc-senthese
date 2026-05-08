@@ -31,11 +31,15 @@ export async function requirePermission(
 
   const user = await prisma.user.findUnique({
     where: { id: Number(session.user.id) },
-    select: { permissions: true },
+    select: { permissions: true, approved: true },
   })
 
   if (!user) {
     return { ok: false, message: "User not found" }
+  }
+
+  if (!user.approved) {
+    return { ok: false, message: "Forbidden: Account pending approval" }
   }
 
   if (!user.permissions.includes(permission as Permission)) {

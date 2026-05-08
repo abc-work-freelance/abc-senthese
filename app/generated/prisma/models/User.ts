@@ -41,6 +41,7 @@ export type UserMinAggregateOutputType = {
   role: $Enums.UserRole | null
   email: string | null
   password: string | null
+  approved: boolean | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type UserMaxAggregateOutputType = {
   role: $Enums.UserRole | null
   email: string | null
   password: string | null
+  approved: boolean | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -60,6 +62,7 @@ export type UserCountAggregateOutputType = {
   email: number
   password: number
   permissions: number
+  approved: number
   _all: number
 }
 
@@ -79,6 +82,7 @@ export type UserMinAggregateInputType = {
   role?: true
   email?: true
   password?: true
+  approved?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -88,6 +92,7 @@ export type UserMaxAggregateInputType = {
   role?: true
   email?: true
   password?: true
+  approved?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -98,6 +103,7 @@ export type UserCountAggregateInputType = {
   email?: true
   password?: true
   permissions?: true
+  approved?: true
   _all?: true
 }
 
@@ -195,6 +201,7 @@ export type UserGroupByOutputType = {
   email: string
   password: string
   permissions: $Enums.Permission[]
+  approved: boolean
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -228,6 +235,7 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   permissions?: Prisma.EnumPermissionNullableListFilter<"User">
+  approved?: Prisma.BoolFilter<"User"> | boolean
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
 }
@@ -240,6 +248,7 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  approved?: Prisma.SortOrder
   createdCommands?: Prisma.CommandOrderByRelationAggregateInput
   assignedCommands?: Prisma.CommandOrderByRelationAggregateInput
 }
@@ -255,6 +264,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   password?: Prisma.StringFilter<"User"> | string
   permissions?: Prisma.EnumPermissionNullableListFilter<"User">
+  approved?: Prisma.BoolFilter<"User"> | boolean
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
 }, "id" | "email">
@@ -267,6 +277,7 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  approved?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -285,6 +296,7 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   permissions?: Prisma.EnumPermissionNullableListFilter<"User">
+  approved?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
 }
 
 export type UserCreateInput = {
@@ -294,6 +306,7 @@ export type UserCreateInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
 }
@@ -306,6 +319,7 @@ export type UserUncheckedCreateInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
 }
@@ -317,6 +331,7 @@ export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
 }
@@ -329,6 +344,7 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
 }
@@ -341,6 +357,7 @@ export type UserCreateManyInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
 }
 
 export type UserUpdateManyMutationInput = {
@@ -350,6 +367,7 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -360,6 +378,7 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type EnumPermissionNullableListFilter<$PrismaModel = never> = {
@@ -378,6 +397,7 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  approved?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -391,6 +411,7 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  approved?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -400,6 +421,7 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  approved?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -431,6 +453,10 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
 export type UserUpdatepermissionsInput = {
   set?: $Enums.Permission[]
   push?: $Enums.Permission | $Enums.Permission[]
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -478,6 +504,7 @@ export type UserCreateWithoutAssignedCommandsInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
 }
 
@@ -489,6 +516,7 @@ export type UserUncheckedCreateWithoutAssignedCommandsInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
@@ -504,6 +532,7 @@ export type UserCreateWithoutCreatedCommandsInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
 }
 
@@ -515,6 +544,7 @@ export type UserUncheckedCreateWithoutCreatedCommandsInput = {
   email: string
   password: string
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
 }
 
@@ -541,6 +571,7 @@ export type UserUpdateWithoutAssignedCommandsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
 }
 
@@ -552,6 +583,7 @@ export type UserUncheckedUpdateWithoutAssignedCommandsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
@@ -573,6 +605,7 @@ export type UserUpdateWithoutCreatedCommandsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
 }
 
@@ -584,6 +617,7 @@ export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
 }
 
@@ -635,6 +669,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   password?: boolean
   permissions?: boolean
+  approved?: boolean
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -648,6 +683,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   permissions?: boolean
+  approved?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -658,6 +694,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   permissions?: boolean
+  approved?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -668,9 +705,10 @@ export type UserSelectScalar = {
   email?: boolean
   password?: boolean
   permissions?: boolean
+  approved?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "familyName" | "role" | "email" | "password" | "permissions", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "familyName" | "role" | "email" | "password" | "permissions" | "approved", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
@@ -693,6 +731,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     password: string
     permissions: $Enums.Permission[]
+    approved: boolean
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1125,6 +1164,7 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly permissions: Prisma.FieldRef<"User", 'Permission[]'>
+  readonly approved: Prisma.FieldRef<"User", 'Boolean'>
 }
     
 
