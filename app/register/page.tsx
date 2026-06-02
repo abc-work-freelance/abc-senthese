@@ -11,6 +11,7 @@ export default function RegisterPage() {
     name: "",
     familyName: "",
     email: "",
+    phone: "",
     password: "",
     role: "INSTRUMENTISTE",
   })
@@ -200,6 +201,22 @@ export default function RegisterPage() {
                 placeholder="john.doe@clinic.com"
                 required
               />
+            </div>
+
+            {/* Phone Field */}
+            <div>
+              <label className="block text-sm font-medium text-[#1A2332] mb-2">Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-[#E8ECF0] bg-white text-[#1A2332] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#00C49A] focus:border-transparent transition-all"
+                placeholder="+212 6 00 00 00 00"
+              />
+              <p className="mt-2 text-xs text-[#94A3B8]">
+                International format (e.g. +212600000000) — used for WhatsApp notifications
+              </p>
             </div>
 
             {/* Password Field */}

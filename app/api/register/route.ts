@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
-    const { name, familyName, email, password, role } = await req.json()
+    const { name, familyName, email, password, role, phone } = await req.json()
 
     if (!name || !familyName || !email || !password || !role) {
       return NextResponse.json(
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role,
+        phone: phone ? String(phone).trim() : null,
         approved: isSuperAdmin,
       },
     })

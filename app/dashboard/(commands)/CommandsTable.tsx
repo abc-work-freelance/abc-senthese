@@ -50,6 +50,35 @@ export function CommandsTable({ data, products, users, isAdmin }: CommandsTableP
       columns={columns}
       searchKey="reference"
       searchPlaceholder="Filter by reference..."
+      title="Commands"
+      exportFileName="commands"
+      exportMapper={(row) => {
+        const command = row as CommandRow
+        return {
+        Reference: command.reference,
+        Type: command.type,
+        Status: command.status,
+        "Date intervention": command.dateIntervention
+          ? new Date(command.dateIntervention).toLocaleDateString()
+          : "",
+        "Date livraison": command.dateLivraison
+          ? new Date(command.dateLivraison).toLocaleDateString()
+          : "",
+        City: command.ville ?? "",
+        Address: command.address ?? "",
+        Clinic: command.clinique ?? "",
+        Doctor: command.doctorName ?? "",
+        Instrumentiste: command.instrumentiste
+          ? `${command.instrumentiste.name ?? ""} ${command.instrumentiste.familyName ?? ""}`.trim()
+          : "",
+        "Payment mode": command.modePaiement ?? "",
+        Comment: command.commentaire ?? "",
+        Products: command.commandProducts
+          .map((cp) => `${cp.product.name} (x${cp.quantity})`)
+          .join(", "),
+        Report: command.completionReport ?? "",
+        }
+      }}
     />
   )
 }

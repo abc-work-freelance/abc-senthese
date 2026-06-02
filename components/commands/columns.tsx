@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Command, Product, User, CommandStatus, ProthesisType } from "@/app/generated/prisma/browser"
+import { Product, User, CommandStatus, ProthesisType } from "@/app/generated/prisma/browser"
 import { CommandDialog } from "./CommandDialog"
 import { DeleteCommandDialog } from "./DeleteCommandDialog"
 import { StatusDialog } from "./StatusDialog"
@@ -202,10 +202,9 @@ export const getColumns = ({ productsList, usersList, isAdmin }: CommandColumnsP
                       id={command.id} 
                       currentStatus={command.status} 
                       allowedStatuses={[
-                        CommandStatus.AFFECTEE,
                         CommandStatus.REPORTEE,
-                        CommandStatus.COMPLETEE,
                         CommandStatus.ANNULEE,
+                        CommandStatus.COMPLETEE,
                       ]}
                       trigger={
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md text-[#0D7B5F] transition-colors hover:bg-[#EBF9F5] hover:text-[#0D7B5F]">

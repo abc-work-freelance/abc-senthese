@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Download } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -37,6 +37,16 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey?: string
   searchPlaceholder?: string
+  /** Topic / heading shown above the table. Also used as the sheet name and default file name. */
+  title?: string
+  /** File name (without extension) for the exported Excel file. Defaults to the title. */
+  exportFileName?: string
+  /**
+   * Optional mapper to control the exported rows. Receives the original row data
+   * and returns a flat object of column header -> value. When omitted, the table
+   * falls back to exporting all columns that declare an `accessorKey`.
+   */
+  exportMapper?: (row: TData) => Record<string, string | number | boolean | null | undefined>
   children?: React.ReactNode
 }
 
@@ -45,6 +55,9 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder = "Search...",
+  title,
+  exportFileName,
+  exportMapper,
   children,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -74,8 +87,44 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  const handleExport = async () => {
+    const XLSX = await import("xlsx")
+
+    // Export every row that passes the current filters (not just the visible page).
+    const rows = table.getFilteredRowModel().rows
+
+    const exportRows = rows.map((row) => {
+      if (exportMapper) return exportMapper(row.original)
+
+      // Fallback: export all columns that expose a plain accessor value.
+      const record: Record<string, string | number | boolean | null | undefined> = {}
+      for (const column of columns) {
+        const accessorKey = (column as { accessorKey?: string }).accessorKey
+        if (!accessorKey) continue
+        const header = typeof column.header === "string" ? column.header : accessorKey
+        const value = (row.original as Record<string, unknown>)[accessorKey]
+        record[header] =
+          value instanceof Date
+            ? value.toISOString()
+            : (value as string | number | boolean | null | undefined)
+      }
+      return record
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet(exportRows)
+    const workbook = XLSX.utils.book_new()
+    const sheetName = (title || "Data").slice(0, 31) // Excel sheet name limit
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName)
+    XLSX.writeFile(workbook, `${exportFileName || title || "export"}.xlsx`)
+  }
+
   return (
     <div className="w-full rounded-xl border border-[#E8ECF0] bg-white p-4 shadow-[0_18px_40px_rgba(13,27,46,0.05)]">
+      {title && (
+        <h3 className="px-1 pb-2 text-[18px] font-semibold text-[#1A2332]" style={{ fontFamily: 'var(--font-dm-serif)' }}>
+          {title}
+        </h3>
+      )}
       <div className="flex items-center gap-2 py-2">
         {searchKey && (
           <Input
@@ -89,6 +138,13 @@ export function DataTable<TData, TValue>({
         )}
         <div className="flex-1" />
         {children}
+        <Button
+          variant="outline"
+          onClick={handleExport}
+          disabled={table.getFilteredRowModel().rows.length === 0}
+        >
+          <Download className="mr-2 h-4 w-4" /> Export Excel
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

@@ -64,7 +64,12 @@ export default async function CommandsPage() {
       where: { role: UserRole.INSTRUMENTISTE }
   })
 
-  const commandsStat = await prisma.command.findMany()
+  const commandsStat = await prisma.command.findMany({
+    where:
+      role === UserRole.INSTRUMENTISTE && userId
+        ? { instrumentisteId: parseInt(userId) }
+        : undefined,
+  })
   const panelCommands = (role === UserRole.ADMIN ? commandsStat : commands) as DashboardCommand[]
 
   const typeCounts = commandsStat.reduce(

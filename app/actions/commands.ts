@@ -7,6 +7,7 @@ import { ProthesisType, PaymentMode, CommandStatus } from "@/app/generated/prism
 import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
 import { broadcastEntityChange } from "@/lib/ws-notify"
+import { notifyCommandAssignment } from "@/lib/whatsapp"
 import { mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { randomUUID } from "node:crypto"
@@ -34,6 +35,39 @@ export type CreateCommandInput = {
 
 export type UpdateCommandInput = Partial<Omit<CreateCommandInput, 'products'>> & {
   products?: CommandProductInput[]
+}
+
+// Sends a WhatsApp notification (in French) to the instrumentiste an order was
+// just assigned to. Never throws — assignment must succeed even if WhatsApp fails.
+async function sendAssignmentNotification(
+  reference: string,
+  instrumentisteId: number,
+  adminId: number
+) {
+  try {
+    const [instrumentiste, admin] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: instrumentisteId },
+        select: { name: true, familyName: true, phone: true },
+      }),
+      prisma.user.findUnique({
+        where: { id: adminId },
+        select: { name: true, familyName: true },
+      }),
+    ])
+
+    if (!instrumentiste) return
+
+    await notifyCommandAssignment({
+      instrumentistePhone: instrumentiste.phone,
+      instrumentisteName: `${instrumentiste.name} ${instrumentiste.familyName}`.trim(),
+      adminName: admin ? `${admin.name} ${admin.familyName}`.trim() : "L'administration",
+      reference,
+      assignedAt: new Date(),
+    })
+  } catch (error) {
+    console.error("[whatsapp] assignment notification error:", error)
+  }
 }
 
 export async function createCommand(data: CreateCommandInput) {
@@ -214,6 +248,15 @@ export async function updateCommandStatus(id: number, status: CommandStatus) {
       if (!command || command.instrumentisteId !== userId) {
         return { success: false, message: "Forbidden" }
       }
+
+      const allowedStatuses: CommandStatus[] = [
+        CommandStatus.REPORTEE,
+        CommandStatus.ANNULEE,
+        CommandStatus.COMPLETEE,
+      ]
+      if (!allowedStatuses.includes(status)) {
+        return { success: false, message: "Forbidden status change" }
+      }
     }
 
     const command = await prisma.command.update({
@@ -226,6 +269,15 @@ export async function updateCommandStatus(id: number, status: CommandStatus) {
       action: "status_changed",
       id: command.id,
     })
+
+    // When an admin sets the order to AFFECTEE, notify the assigned instrumentiste.
+    if (
+      role === "ADMIN" &&
+      status === CommandStatus.AFFECTEE &&
+      command.instrumentisteId
+    ) {
+      await sendAssignmentNotification(command.reference, command.instrumentisteId, userId)
+    }
 
     revalidatePath(`/commands/${id}`)
     revalidatePath("/commands")
