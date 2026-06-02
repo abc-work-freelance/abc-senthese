@@ -1,11 +1,3 @@
-"use client"
-
-import { Card } from "@/components/ui/card"
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js"
-import { Doughnut } from "react-chartjs-2"
-
-ChartJS.register(ArcElement, Tooltip, Legend)
-
 type ChartsSectionProps = {
   data: {
     hip: number
@@ -14,93 +6,79 @@ type ChartsSectionProps = {
   }
 }
 
-const chartColors = ["#00C49A", "#0EA5E9", "#8B5CF6"]
+const SEGMENTS = [
+  { key: "hip", label: "Hip", color: "#0E9E84" },
+  { key: "knee", label: "Knee", color: "#2B6CD4" },
+  { key: "shoulder", label: "Shoulder", color: "#6D5BD0" },
+] as const
 
 export function ChartsSection({ data }: ChartsSectionProps) {
-  const total = Math.max(data.hip + data.knee + data.shoulder, 1)
+  const total = data.hip + data.knee + data.shoulder
+  const safeTotal = Math.max(total, 1)
 
-  const chartData = {
-    labels: ["HIP", "KNEE", "SHOULDER"],
-    datasets: [
-      {
-        data: [data.hip, data.knee, data.shoulder],
-        backgroundColor: chartColors,
-        borderColor: ["#FFFFFF", "#FFFFFF", "#FFFFFF"],
-        borderWidth: 2,
-        hoverOffset: 4,
-      },
-    ],
-  }
+  // Build donut segments using the dash-array technique on a r=15.915 circle
+  // (circumference ≈ 100), so each dash length maps directly to a percentage.
+  const arcs = SEGMENTS.map((segment, i) => {
+    const pct = (data[segment.key] / safeTotal) * 100
+    const before = SEGMENTS.slice(0, i).reduce((acc, s) => acc + data[s.key], 0) / safeTotal * 100
+    return { color: segment.color, pct, offset: 25 - before }
+  })
 
   return (
-    <Card className="border-[#E8ECF0] bg-white p-5 shadow-none" style={{ borderRadius: "14px" }}>
-      <div className="flex items-start justify-between gap-4">
+    <div className="card card-pad">
+      <div className="card-head">
         <div>
-          <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#94A3B8]">
-            Prosthesis mix
-          </div>
-          <h3 className="mt-1 text-[20px] font-semibold text-[#1A2332]">
-            Distribution by type
-          </h3>
-          <p className="mt-1 text-sm text-[#94A3B8]">
-            {total} commands across the active prosthetics catalog.
-          </p>
-        </div>
-        <div className="rounded-full border border-[#E8ECF0] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">
-          HIP / KNEE / SHOULDER
+          <div className="eyebrow">Prosthesis mix</div>
+          <div className="card-title">Distribution by type</div>
         </div>
       </div>
-
-      <div className="mt-5 grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center">
-        <div className="mx-auto w-full max-w-[220px]">
-          <Doughnut
-            data={chartData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: true,
-              cutout: "72%",
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  backgroundColor: "#0D1B2E",
-                  padding: 12,
-                  titleColor: "#FFFFFF",
-                  bodyColor: "#FFFFFF",
-                },
-              },
-            }}
-          />
+      <div className="donut-wrap">
+        <div className="donut">
+          <svg viewBox="0 0 42 42" width="152" height="152">
+            <circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--surface-3)" strokeWidth="5" />
+            {arcs.map((arc, i) =>
+              arc.pct > 0 ? (
+                <circle
+                  key={i}
+                  cx="21"
+                  cy="21"
+                  r="15.915"
+                  fill="none"
+                  stroke={arc.color}
+                  strokeWidth="5"
+                  strokeDasharray={`${arc.pct} ${100 - arc.pct}`}
+                  strokeDashoffset={arc.offset}
+                  strokeLinecap="round"
+                />
+              ) : null
+            )}
+          </svg>
+          <div className="donut-center">
+            <div>
+              <div className="n num">{total}</div>
+              <div className="l">Total</div>
+            </div>
+          </div>
         </div>
-
-        <div className="space-y-3">
-          {[
-            { label: "HIP", value: data.hip, color: chartColors[0], background: "#EBF9F5" },
-            { label: "KNEE", value: data.knee, color: chartColors[1], background: "#EBF5FF" },
-            { label: "SHOULDER", value: data.shoulder, color: chartColors[2], background: "#F3EEFF" },
-          ].map((item) => {
-            const percentage = Math.round((item.value / total) * 100)
-
+        <div className="legend">
+          {SEGMENTS.map((segment) => {
+            const value = data[segment.key]
+            const pct = Math.round((value / safeTotal) * 100)
             return (
-              <div key={item.label} className="rounded-xl border border-[#E8ECF0] bg-[#F8FAFC] p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-md" style={{ backgroundColor: item.background, color: item.color }}>
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                    </span>
-                    <div>
-                      <div className="text-sm font-semibold text-[#1A2332]">{item.label}</div>
-                      <div className="text-xs text-[#94A3B8]">{item.value} commands</div>
-                    </div>
-                  </div>
-                  <div className="text-sm font-semibold" style={{ color: item.color }}>
-                    {percentage}%
-                  </div>
-                </div>
+              <div className="leg-row" key={segment.key}>
+                <span className="leg-dot" style={{ background: segment.color }} />
+                <span className="leg-name">{segment.label}</span>
+                <span className="leg-bar">
+                  <span style={{ width: `${pct}%`, background: segment.color }} />
+                </span>
+                <span className="leg-val">
+                  <b>{value}</b> · {pct}%
+                </span>
               </div>
             )
           })}
         </div>
       </div>
-    </Card>
+    </div>
   )
 }
