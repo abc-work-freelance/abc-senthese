@@ -37,6 +37,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey?: string
   searchPlaceholder?: string
+  /** Pre-fill the search box (e.g. from a ?q= deep link). */
+  initialSearch?: string
   /** Topic / heading shown above the table. Also used as the sheet name and default file name. */
   title?: string
   /** File name (without extension) for the exported Excel file. Defaults to the title. */
@@ -55,6 +57,7 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder = "Search...",
+  initialSearch,
   title,
   exportFileName,
   exportMapper,
@@ -62,7 +65,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    initialSearch && searchKey ? [{ id: searchKey, value: initialSearch }] : []
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -119,9 +122,9 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="w-full rounded-xl border border-[#E8ECF0] bg-white p-4 shadow-[0_18px_40px_rgba(13,27,46,0.05)]">
+    <div className="w-full rounded-xl border border-border bg-card text-card-foreground p-4 shadow-sm">
       {title && (
-        <h3 className="px-1 pb-2 text-[18px] font-semibold text-[#1A2332]" style={{ fontFamily: 'var(--font-dm-serif)' }}>
+        <h3 className="px-1 pb-2 text-[18px] font-semibold text-foreground" style={{ fontFamily: 'var(--font-dm-serif)' }}>
           {title}
         </h3>
       )}
@@ -172,7 +175,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="mt-3 rounded-xl border border-[#E8ECF0] overflow-hidden">
+      <div className="mt-3 rounded-xl border border-border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

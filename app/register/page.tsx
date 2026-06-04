@@ -131,8 +131,14 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="divider-text">Already have an account? <Link href="/login" className="act">Sign in</Link></div>
-      </div>
+        {/* <div className="divider-text">Already have an account? <Link href="/login" className="act">Sign in</Link></div> */}
+        <div className="divider-text flex justify-between">
+          <div className="">
+              Already have an account? 
+            </div>
+            <Link href="/login" className="act">Login</Link>
+          </div>
+        </div>
     </AuthShell>
   )
 }

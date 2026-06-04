@@ -13,7 +13,28 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import { LogoutModal } from "./elements/Logout-Modal"
+
+// The dashboard, interventions and commands "tabs" are all anchors on the same
+// /dashboard page, so highlighting can't rely on the pathname alone — we also
+// need the current hash to keep exactly one item active at a time.
+function useCurrentHash() {
+  const pathname = usePathname()
+  const [hash, setHash] = useState("")
+
+  // Re-read on hash changes AND on pathname changes — a route change to a
+  // hash-less URL doesn't always fire `hashchange`, which would otherwise leave
+  // a stale hash and keep the wrong tab highlighted.
+  useEffect(() => {
+    const update = () => setHash(window.location.hash)
+    update()
+    window.addEventListener("hashchange", update)
+    return () => window.removeEventListener("hashchange", update)
+  }, [pathname])
+
+  return hash
+}
 
 type SidebarRole = "ADMIN" | "INSTRUMENTISTE"
 
@@ -45,15 +66,28 @@ type NavEntry = {
 function NavItem({
   entry,
   pathname,
+  currentHash,
   onNavigate,
 }: {
   entry: NavEntry
   pathname: string
+  currentHash: string
   onNavigate?: () => void
 }) {
   const Icon = entry.icon
-  const target = entry.href.split("#")[0]
-  const active = entry.exact ? pathname === target : pathname.startsWith(target)
+  const [target, hashPart] = entry.href.split("#")
+  const targetHash = hashPart ? `#${hashPart}` : ""
+
+  let active: boolean
+  if (targetHash) {
+    // Anchor tab (e.g. #commands): active only when its hash is selected.
+    active = pathname === target && currentHash === targetHash
+  } else if (entry.exact) {
+    // Plain dashboard: active only with no hash, so anchor tabs don't steal it.
+    active = pathname === target && !currentHash
+  } else {
+    active = pathname.startsWith(target)
+  }
 
   return (
     <Link href={entry.href} className={`nav-item${active ? " active" : ""}`} onClick={onNavigate}>
@@ -76,6 +110,7 @@ export function AppSidebarContent({
   onNavigate,
 }: AppSidebarContentProps) {
   const pathname = usePathname()
+  const currentHash = useCurrentHash()
   const isAdmin = role === "ADMIN"
 
   const overview: NavEntry[] = [
@@ -91,8 +126,10 @@ export function AppSidebarContent({
 
   const operations: NavEntry[] = [
     { href: "/dashboard#commands", label: "Commands", icon: ClipboardList, badge: counts?.commands },
-    { href: "/dashboard/products", label: "Products", icon: Package },
   ]
+  // Products is an admin-only page (also enforced in middleware), so an
+  // instrumentiste should never see the nav entry for it.
+  if (isAdmin) operations.push({ href: "/dashboard/products", label: "Products", icon: Package })
 
   const administration: NavEntry[] = []
   if (isAdmin) administration.push({ href: "/dashboard/permissions", label: "Permissions", icon: ShieldCheck })
@@ -102,23 +139,28 @@ export function AppSidebarContent({
   return (
     <>
       <div className="brand">
-        <span className="brand-logo-chip">
-          <Image src="/assets/abc-logo.png" alt="ABC Synthese — prosthetics management" width={51} height={34} priority />
-        </span>
+        <Image
+          className="brand-logo"
+          src="/assets/abc-logo-light.png"
+          alt="ABC Synthese — prosthetics management"
+          width={909}
+          height={602}
+          priority
+        />
       </div>
 
       <nav className="nav">
         <div className="nav-group" style={{ marginTop: 4 }}>
           <div className="nav-label">Overview</div>
           {overview.map((entry) => (
-            <NavItem key={entry.label} entry={entry} pathname={pathname} onNavigate={onNavigate} />
+            <NavItem key={entry.label} entry={entry} pathname={pathname} currentHash={currentHash} onNavigate={onNavigate} />
           ))}
         </div>
 
         <div className="nav-group">
           <div className="nav-label">Operations</div>
           {operations.map((entry) => (
-            <NavItem key={entry.label} entry={entry} pathname={pathname} onNavigate={onNavigate} />
+            <NavItem key={entry.label} entry={entry} pathname={pathname} currentHash={currentHash} onNavigate={onNavigate} />
           ))}
         </div>
 
@@ -126,27 +168,33 @@ export function AppSidebarContent({
           <div className="nav-group">
             <div className="nav-label">Administration</div>
             {administration.map((entry) => (
-              <NavItem key={entry.label} entry={entry} pathname={pathname} onNavigate={onNavigate} />
+              <NavItem key={entry.label} entry={entry} pathname={pathname} currentHash={currentHash} onNavigate={onNavigate} />
             ))}
           </div>
         )}
       </nav>
 
       <div className="side-foot">
-        <div className="user-card">
-          <span className="avatar">{initials || "ON"}</span>
-          <span className="user-meta">
-            <span className="user-name">{name || email || "ABC Synthese user"}</span>
-            <span className="user-role">{isAdmin ? "Administrator" : "Instrumentiste"}</span>
-          </span>
-          <Link href="/dashboard/settings" className="icon-btn-ghost" title="Settings" onClick={onNavigate}>
-            <Settings />
-          </Link>
-          <LogoutModal>
-            <button className="icon-btn-ghost" title="Sign out" type="button">
-              <LogOut />
-            </button>
-          </LogoutModal>
+        <div className="user-panel">
+          <div className="user-card">
+            <span className="avatar">{initials || "ON"}</span>
+            <span className="user-meta">
+              <span className="user-name">{isAdmin ? "Administrator" : "Instrumentiste"}</span>
+              <span className="user-role">{email || name || "ABC Synthese user"}</span>
+            </span>
+          </div>
+          <div className="user-actions">
+            <Link href="/dashboard/settings" className="user-action" title="Settings" onClick={onNavigate}>
+              <Settings />
+              <span>Settings</span>
+            </Link>
+            <LogoutModal>
+              <button className="user-action" title="Sign out" type="button">
+                <LogOut />
+                <span>Sign Out</span>
+              </button>
+            </LogoutModal>
+          </div>
         </div>
       </div>
     </>

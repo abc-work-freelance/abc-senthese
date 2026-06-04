@@ -4,13 +4,18 @@ import type { ReactNode } from "react"
 import "./auth.css"
 import ThemeToggle from "./ThemeToggle"
 
-type Variant = "login" | "register" | "pending"
+type Variant = "login" | "register" | "pending" | "reset"
 
 const panelCopy: Record<Variant, { eyebrow: string; title: string; desc: string }> = {
   login: {
     eyebrow: "Prosthetics command management",
     title: "Clinical command, from intake to the OR.",
     desc: "Track HIP, KNEE and SHOULDER orders, assign instrumentistes, schedule interventions, and close every case with a report — in one shared workspace.",
+  },
+  reset: {
+    eyebrow: "Account recovery",
+    title: "Back to your workspace in a moment.",
+    desc: "We'll send a one-time verification code to the phone number on your account so you can securely set a new password.",
   },
   register: {
     eyebrow: "Join the network",

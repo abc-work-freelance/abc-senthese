@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
-import { Bell, ChevronRight, Moon, Search, Sun } from "lucide-react"
+import { ChevronRight, Moon, Sun } from "lucide-react"
+import { NotificationBell } from "./NotificationBell"
+import { TopbarSearch } from "./TopbarSearch"
 
 const ACCENTS = ["teal", "blue", "violet"] as const
 type Accent = (typeof ACCENTS)[number]
@@ -61,14 +63,10 @@ export function Topbar({ leading }: { leading?: React.ReactNode }) {
         Workspace <ChevronRight strokeWidth={2} /> <b>{crumbLabel(pathname)}</b>
       </div>
 
-      <label className="search">
-        <Search strokeWidth={2} />
-        <input placeholder="Search commands, doctors, clinics…" />
-        <kbd>⌘K</kbd>
-      </label>
+      <TopbarSearch />
 
       <div className="top-actions">
-        <div className="swatches">
+        {/* <div className="swatches">
           {ACCENTS.map((c) => (
             <button
               key={c}
@@ -80,16 +78,13 @@ export function Topbar({ leading }: { leading?: React.ReactNode }) {
               onClick={() => pickAccent(c)}
             />
           ))}
-        </div>
+        </div> */}
 
         <button className="tbtn" type="button" title="Toggle theme" onClick={toggleTheme} aria-label="Toggle theme">
           {theme === "dark" ? <Sun strokeWidth={2} /> : <Moon strokeWidth={2} />}
         </button>
 
-        <button className="tbtn" type="button" title="Notifications" aria-label="Notifications">
-          <span className="dot" />
-          <Bell strokeWidth={2} />
-        </button>
+        <NotificationBell />
       </div>
     </header>
   )

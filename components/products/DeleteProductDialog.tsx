@@ -14,17 +14,29 @@ import {
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 import { deleteProduct } from "@/app/actions/products"
+import { useToast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 
 interface DeleteProductDialogProps {
   id: number
 }
 
 export function DeleteProductDialog({ id }: DeleteProductDialogProps) {
+  const toast = useToast()
+  const router = useRouter()
+
   const handleDelete = async () => {
     try {
-      await deleteProduct(id)
+      const result = await deleteProduct(id)
+      if (result?.success) {
+        toast.success("Product deleted.")
+        router.refresh()
+      } else {
+        toast.error(result?.message || "Failed to delete product.")
+      }
     } catch (error) {
       console.error("Failed to delete product", error)
+      toast.error("Failed to delete product. Please try again.")
     }
   }
 

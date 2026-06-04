@@ -63,23 +63,23 @@ export default async function ApprovalsPage() {
     <div className="space-y-6">
       {/* Hero / header card */}
       <div
-        className="relative overflow-hidden rounded-2xl border bg-white p-6 shadow-[0_8px_24px_rgba(13,27,46,0.08)]"
+        className="relative overflow-hidden rounded-2xl border bg-card p-6 shadow-[0_8px_24px_rgba(13,27,46,0.08)]"
         style={{ borderColor: "var(--med-border)" }}
       >
         <div
           className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full opacity-20 blur-3xl"
           style={{
             backgroundImage:
-              "linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)",
+              "linear-gradient(135deg, var(--accent), var(--accent-2))",
           }}
         />
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-[0_8px_18px_rgba(0,196,154,0.25)]"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)",
+                  "linear-gradient(135deg, var(--accent), var(--accent-2))",
               }}
             >
               <UserCheck className="h-6 w-6" />
@@ -114,12 +114,12 @@ export default async function ApprovalsPage() {
             className="flex items-center gap-3 rounded-xl border px-4 py-3"
             style={{
               borderColor: "var(--med-border)",
-              backgroundColor: "#F8FAFC",
+              backgroundColor: "var(--surface-2)",
             }}
           >
             <span
               className="flex h-9 w-9 items-center justify-center rounded-lg"
-              style={{ backgroundColor: "#EBF9F5", color: "#0D7B5F" }}
+              style={{ backgroundColor: "var(--accent-weak)", color: "var(--accent-2)" }}
             >
               <UserPlus className="h-4 w-4" />
             </span>
@@ -144,12 +144,12 @@ export default async function ApprovalsPage() {
       {/* List of pending users */}
       {pendingCount === 0 ? (
         <div
-          className="flex flex-col items-center justify-center gap-4 rounded-2xl border bg-white px-6 py-16 text-center shadow-[0_8px_24px_rgba(13,27,46,0.04)]"
+          className="flex flex-col items-center justify-center gap-4 rounded-2xl border bg-card px-6 py-16 text-center shadow-[0_8px_24px_rgba(13,27,46,0.04)]"
           style={{ borderColor: "var(--med-border)" }}
         >
           <span
             className="flex h-14 w-14 items-center justify-center rounded-full"
-            style={{ backgroundColor: "#EBF9F5", color: "#0D7B5F" }}
+            style={{ backgroundColor: "var(--accent-weak)", color: "var(--accent-2)" }}
           >
             <ShieldCheck className="h-7 w-7" />
           </span>
@@ -176,23 +176,23 @@ export default async function ApprovalsPage() {
             return (
               <div
                 key={user.id}
-                className="group relative overflow-hidden rounded-2xl border bg-white p-5 shadow-[0_8px_24px_rgba(13,27,46,0.06)] transition-shadow hover:shadow-[0_12px_32px_rgba(13,27,46,0.10)]"
+                className="group relative overflow-hidden rounded-2xl border bg-card p-5 shadow-[0_8px_24px_rgba(13,27,46,0.06)] transition-shadow hover:shadow-[0_12px_32px_rgba(13,27,46,0.10)]"
                 style={{ borderColor: "var(--med-border)" }}
               >
                 <span
                   className="pointer-events-none absolute inset-x-0 top-0 h-1"
                   style={{
                     backgroundImage:
-                      "linear-gradient(90deg, #00C49A 0%, #0EA5E9 100%)",
+                      "linear-gradient(90deg, var(--accent), var(--accent-2))",
                   }}
                 />
 
                 <div className="flex items-start gap-4">
                   <span
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white shadow-[0_4px_12px_rgba(0,196,154,0.25)]"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white shadow-sm"
                     style={{
                       backgroundImage:
-                        "linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)",
+                        "linear-gradient(135deg, var(--accent), var(--accent-2))",
                     }}
                   >
                     {getInitials(user.name, user.familyName)}
@@ -209,8 +209,10 @@ export default async function ApprovalsPage() {
                       <span
                         className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.14em]"
                         style={{
-                          backgroundColor: isAdmin ? "#EAF2FF" : "#EBF9F5",
-                          color: isAdmin ? "#2563EB" : "#0D7B5F",
+                          backgroundColor: isAdmin
+                            ? "color-mix(in srgb, var(--info) 14%, transparent)"
+                            : "var(--accent-weak)",
+                          color: isAdmin ? "var(--info)" : "var(--accent-2)",
                         }}
                       >
                         {isAdmin ? "Admin" : "Instrumentiste"}
@@ -238,10 +240,10 @@ export default async function ApprovalsPage() {
                   >
                     <button
                       type="submit"
-                      className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(0,196,154,0.25)] transition-opacity hover:opacity-90"
+                      className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                       style={{
                         backgroundImage:
-                          "linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)",
+                          "linear-gradient(135deg, var(--accent), var(--accent-2))",
                       }}
                     >
                       <Check className="h-4 w-4" />
@@ -258,10 +260,10 @@ export default async function ApprovalsPage() {
                   >
                     <button
                       type="submit"
-                      className="flex w-full items-center justify-center gap-2 rounded-md border bg-white px-3 py-2 text-sm font-semibold transition-colors hover:bg-[#FEF2F2]"
+                      className="flex w-full items-center justify-center gap-2 rounded-md border bg-card px-3 py-2 text-sm font-semibold transition-colors hover:opacity-80"
                       style={{
-                        borderColor: "#FECACA",
-                        color: "#B91C1C",
+                        borderColor: "color-mix(in srgb, var(--danger) 45%, transparent)",
+                        color: "var(--danger)",
                       }}
                     >
                       <X className="h-4 w-4" />

@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { format } from "date-fns"
-import { Download, ListFilter, MoreVertical } from "lucide-react"
+import { Download, ListFilter, MoreVertical, X } from "lucide-react"
 import { Product, User, CommandStatus, ProthesisType } from "@/app/generated/prisma/browser"
 import { CommandDialog } from "@/components/commands/CommandDialog"
 import { DeleteCommandDialog } from "@/components/commands/DeleteCommandDialog"
@@ -36,11 +37,38 @@ type CommandRow = {
   } | null
 }
 
+interface CommandPermissions {
+  canCreate: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canStatus: boolean
+}
+
 interface CommandsTableProps {
   data: CommandRow[]
   products: Product[]
   users: User[]
   isAdmin: boolean
+  perms?: CommandPermissions
+  /** Free-text search coming from the top-bar search (?q=...). */
+  query?: string
+}
+
+// Matches a command against a free-text query across the fields a user is most
+// likely to search by (reference, people, places, type and product names).
+function commandMatchesQuery(command: CommandRow, q: string): boolean {
+  const haystack = [
+    command.reference,
+    command.type,
+    command.ville,
+    command.clinique,
+    command.doctorName,
+    ...command.commandProducts.flatMap((cp) => [cp.product.name, cp.product.code]),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+  return haystack.includes(q)
 }
 
 const STATUS_CLASS: Record<CommandStatus, string> = {
@@ -68,10 +96,22 @@ const SEGMENTS = [
 
 type SegmentKey = (typeof SEGMENTS)[number]["key"]
 
-export function CommandsTable({ data, products, users, isAdmin }: CommandsTableProps) {
+export function CommandsTable({ data, products, users, isAdmin, perms, query }: CommandsTableProps) {
+  const router = useRouter()
   const [segment, setSegment] = useState<SegmentKey>("ALL")
+  const canUpdate = perms?.canUpdate ?? false
+  const canDelete = perms?.canDelete ?? false
+  const canStatus = perms?.canStatus ?? false
 
-  const rows = segment === "ALL" ? data : data.filter((row) => row.status === segment)
+  const trimmedQuery = query?.trim().toLowerCase() ?? ""
+
+  // When searching, results span every status so the match is never hidden by
+  // the status segment; otherwise fall back to the segment filter.
+  const rows = trimmedQuery
+    ? data.filter((row) => commandMatchesQuery(row, trimmedQuery))
+    : segment === "ALL"
+      ? data
+      : data.filter((row) => row.status === segment)
 
   const handleExport = async () => {
     const XLSX = await import("xlsx")
@@ -103,13 +143,27 @@ export function CommandsTable({ data, products, users, isAdmin }: CommandsTableP
         <div className="eyebrow" style={{ fontSize: 11 }}>
           Commands
         </div>
-        <div className="seg" style={{ marginLeft: 6 }}>
-          {SEGMENTS.map((s) => (
-            <button key={s.key} className={segment === s.key ? "on" : ""} onClick={() => setSegment(s.key)} type="button">
-              {s.label}
-            </button>
-          ))}
-        </div>
+        {!trimmedQuery && (
+          <div className="seg" style={{ marginLeft: 6 }}>
+            {SEGMENTS.map((s) => (
+              <button key={s.key} className={segment === s.key ? "on" : ""} onClick={() => setSegment(s.key)} type="button">
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {trimmedQuery && (
+          <button
+            className="search-chip"
+            type="button"
+            style={{ marginLeft: 6 }}
+            onClick={() => router.push("/dashboard#commands")}
+            title="Clear search"
+          >
+            <span>Results for “{query?.trim()}”</span>
+            <X />
+          </button>
+        )}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           <button className="filter-chip" type="button" disabled aria-hidden>
             <ListFilter />
@@ -186,26 +240,30 @@ export function CommandsTable({ data, products, users, isAdmin }: CommandsTableP
                       <div className="row-act" style={{ justifyContent: "flex-end" }}>
                         {isAdmin ? (
                           <>
-                            <CommandDialog
-                              command={{ ...command, modePaiement: command.modePaiement ?? undefined }}
-                              productsList={products}
-                              usersList={users}
-                              trigger={
-                                <button className="act" title="Edit" type="button">
-                                  <SquarePen />
-                                </button>
-                              }
-                            />
-                            <StatusDialog
-                              id={command.id}
-                              currentStatus={command.status}
-                              trigger={
-                                <button className="act" title="Status" type="button">
-                                  <Activity />
-                                </button>
-                              }
-                            />
-                            <DeleteCommandDialog id={command.id} />
+                            {canUpdate && (
+                              <CommandDialog
+                                command={{ ...command, modePaiement: command.modePaiement ?? undefined }}
+                                productsList={products}
+                                usersList={users}
+                                trigger={
+                                  <button className="act" title="Edit" type="button">
+                                    <SquarePen />
+                                  </button>
+                                }
+                              />
+                            )}
+                            {canStatus && (
+                              <StatusDialog
+                                id={command.id}
+                                currentStatus={command.status}
+                                trigger={
+                                  <button className="act" title="Status" type="button">
+                                    <Activity />
+                                  </button>
+                                }
+                              />
+                            )}
+                            {canDelete && <DeleteCommandDialog id={command.id} />}
                           </>
                         ) : (
                           <>

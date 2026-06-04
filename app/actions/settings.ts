@@ -49,6 +49,45 @@ export async function updateProfileName(name: string): Promise<ActionResult> {
   }
 }
 
+export async function updateProfilePhone(phone: string): Promise<ActionResult> {
+  try {
+    const session = await getServerSession(authOptions)
+    const userId = getSessionUserId(session?.user?.id)
+
+    if (!userId) {
+      return { success: false, message: "Unauthorized" }
+    }
+
+    const trimmed = phone.trim()
+
+    // Allow clearing the number, otherwise require international E.164-ish form
+    // (optional leading +, 8–15 digits) since it's used for WhatsApp delivery.
+    if (trimmed && !/^\+?[1-9]\d{7,14}$/.test(trimmed.replace(/[\s-]/g, ""))) {
+      return {
+        success: false,
+        message: "Enter a valid international number, e.g. +212600000000.",
+      }
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { phone: trimmed ? trimmed.replace(/[\s-]/g, "") : null },
+    })
+
+    revalidatePath("/dashboard/settings")
+
+    return {
+      success: true,
+      message: trimmed
+        ? "WhatsApp number saved. You can now receive password-reset codes."
+        : "WhatsApp number removed.",
+    }
+  } catch (error) {
+    console.error("Update profile phone error:", error)
+    return { success: false, message: "Failed to update your phone number." }
+  }
+}
+
 export async function updateProfilePassword(
   currentPassword: string,
   newPassword: string,

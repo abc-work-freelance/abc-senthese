@@ -11,6 +11,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const registered = searchParams.get("registered") === "true"
+  const passwordReset = searchParams.get("reset") === "true"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -51,6 +52,13 @@ function LoginForm() {
         </div>
       )}
 
+      {passwordReset && (
+        <div className="notice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" /></svg>
+          <p><b>Password updated.</b> Sign in with your new password.</p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="l-email">Email address</label>
@@ -81,7 +89,7 @@ function LoginForm() {
 
         <div className="row-between">
           <label className="checkbox"><input type="checkbox" /> Remember me</label>
-          <Link href="/login" className="link">Forgot password?</Link>
+          <Link href="/forgot-password" className="link">Forgot password?</Link>
         </div>
 
         {error && (
@@ -100,7 +108,14 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="divider-text">Don&apos;t have an account? <Link href="/register" className="act">Create one</Link></div>
+      <div className="divider-text flex justify-around">
+        <div className="">
+          Don&apos;t have an account? 
+        </div>
+        <Link href="/register" className="act">
+          Register
+        </Link>
+      </div>
     </div>
   )
 }

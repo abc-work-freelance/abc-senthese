@@ -21,7 +21,7 @@ export function MobileSidebarButton(props: MobileSidebarButtonProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="tbtn md:hidden"
+        className="tbtn mobile-menu-btn"
         aria-label="Open menu"
         type="button"
       >

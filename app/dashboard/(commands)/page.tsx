@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { CommandDialog } from "@/components/commands/CommandDialog"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getEffectivePermissions } from "@/lib/permissions"
 import { UserRole, CommandStatus } from "@/app/generated/prisma/client"
 import { format } from "date-fns"
 import { CommandsTable } from "./CommandsTable"
@@ -51,10 +52,23 @@ function initialsOf(name?: string | null, familyName?: string | null) {
   return `${name?.[0] ?? ""}${familyName?.[0] ?? ""}`.toUpperCase() || "?"
 }
 
-export default async function CommandsPage() {
+export default async function CommandsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q: searchQuery } = await searchParams
   const session = await getServerSession(authOptions)
   const role = session?.user?.role
   const userId = session?.user?.id
+  const isAdmin = role === UserRole.ADMIN
+  const permissions = isAdmin ? await getEffectivePermissions() : []
+  const perms = {
+    canCreate: permissions.includes("COMMAND_CREATE"),
+    canUpdate: permissions.includes("COMMAND_UPDATE"),
+    canDelete: permissions.includes("COMMAND_DELETE"),
+    canStatus: permissions.includes("COMMAND_STATUS_UPDATE"),
+  }
 
   let commands: DashboardCommand[] = []
 
@@ -207,7 +221,7 @@ export default async function CommandsPage() {
             {interventionsToday === 1 ? "" : "s"} scheduled today
           </p>
         </div>
-        {role === UserRole.ADMIN && (
+        {isAdmin && perms.canCreate && (
           <CommandDialog
             productsList={products || []}
             usersList={users || []}
@@ -232,7 +246,7 @@ export default async function CommandsPage() {
             <CadenceCard data={cadence} />
           </div>
 
-          <CommandsTable data={commands || []} products={products || []} users={users || []} isAdmin={role === UserRole.ADMIN} />
+          <CommandsTable data={commands || []} products={products || []} users={users || []} isAdmin={isAdmin} perms={perms} query={searchQuery} />
         </div>
 
         <RightPanel data={{ schedule, ops, load }} />
