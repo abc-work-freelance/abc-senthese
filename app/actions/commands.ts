@@ -6,6 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { ProthesisType, PaymentMode, CommandStatus } from "@/app/generated/prisma/client"
 import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
+import { isUniqueConstraintError, isRecordNotFoundError } from "@/lib/prisma-errors"
 import { broadcastEntityChange } from "@/lib/ws-notify"
 import { notifyCommandAssignment } from "@/lib/whatsapp"
 import { mkdir, writeFile } from "node:fs/promises"
@@ -100,10 +101,14 @@ export async function createCommand(data: CreateCommandInput) {
     })
 
     revalidatePath("/commands")
+    revalidatePath("/dashboard")
     return { success: true, command }
   } catch (error) {
     console.error("Create command error:", error)
-    return { success: false, message: "Failed to create command" }
+    if (isUniqueConstraintError(error, "reference")) {
+      return { success: false, message: `A command with reference "${data.reference}" already exists.` }
+    }
+    return { success: false, message: "Failed to create command. Please try again." }
   }
 }
 
@@ -148,10 +153,17 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
 
     revalidatePath(`/commands/${id}`)
     revalidatePath("/commands")
+    revalidatePath("/dashboard")
     return { success: true, command }
   } catch (error) {
     console.error("Update command error:", error)
-    return { success: false, message: "Failed to update command" }
+    if (isUniqueConstraintError(error, "reference")) {
+      return { success: false, message: `A command with reference "${data.reference}" already exists.` }
+    }
+    if (isRecordNotFoundError(error)) {
+      return { success: false, message: "This command no longer exists. It may have been deleted." }
+    }
+    return { success: false, message: "Failed to update command. Please try again." }
   }
 }
 
@@ -217,10 +229,14 @@ export async function deleteCommand(id: number) {
     })
 
     revalidatePath("/commands")
+    revalidatePath("/dashboard")
     return { success: true, message: "Command deleted successfully" }
   } catch (error) {
     console.error("Delete command error:", error)
-    return { success: false, message: "Failed to delete command" }
+    if (isRecordNotFoundError(error)) {
+      return { success: false, message: "This command has already been deleted." }
+    }
+    return { success: false, message: "Failed to delete command. Please try again." }
   }
 }
 

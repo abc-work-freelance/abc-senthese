@@ -124,6 +124,44 @@ export async function sendWhatsAppTemplate(
   })
 }
 
+/**
+ * Send a password-reset code (in French) to a user over WhatsApp. Returns the
+ * result so the caller can fall back (e.g. log in dev) when delivery is skipped.
+ */
+export async function notifyPasswordReset(
+  phone: string | null | undefined,
+  name: string,
+  code: string,
+  ttlMinutes: number
+): Promise<WhatsAppResult> {
+  if (!phone) {
+    return { success: false, skipped: true, message: "No phone number on file" }
+  }
+
+  // A password reset is a business-initiated message: outside the 24h window
+  // Meta only delivers it via an APPROVED template. Configure a template whose
+  // body has a single {{1}} variable (the code) and set its name below.
+  const resetTemplate = process.env.WHATSAPP_RESET_TEMPLATE_NAME
+  if (resetTemplate) {
+    const templateResult = await sendWhatsAppTemplate(phone, resetTemplate, [code])
+    if (templateResult.success) return templateResult
+    console.warn("[whatsapp] reset template send failed, falling back to plain text")
+  }
+
+  // Fallback: plain text — only delivers if the recipient messaged the business
+  // number within the last 24h (and, for test numbers, is allow-listed).
+  const text =
+    `Bonjour ${name},\n\n` +
+    `Vous avez demandé à réinitialiser votre mot de passe sur la plateforme ABC Synthèse.\n\n` +
+    `• Code de vérification : *${code}*\n` +
+    `• Valable ${ttlMinutes} minutes\n\n` +
+    `Saisissez ce code pour définir un nouveau mot de passe. ` +
+    `Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n` +
+    `Cordialement,\nL'équipe ABC Synthèse`
+
+  return sendWhatsAppText(phone, text)
+}
+
 type AssignmentNotification = {
   instrumentistePhone: string | null | undefined
   instrumentisteName: string

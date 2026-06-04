@@ -14,17 +14,29 @@ import {
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 import { deleteCommand } from "@/app/actions/commands"
+import { useToast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 
 interface DeleteCommandDialogProps {
   id: number
 }
 
 export function DeleteCommandDialog({ id }: DeleteCommandDialogProps) {
+  const toast = useToast()
+  const router = useRouter()
+
   const handleDelete = async () => {
     try {
-      await deleteCommand(id)
+      const result = await deleteCommand(id)
+      if (result?.success) {
+        toast.success("Command deleted.")
+        router.refresh()
+      } else {
+        toast.error(result?.message || "Failed to delete command.")
+      }
     } catch (error) {
       console.error("Failed to delete command", error)
+      toast.error("Failed to delete command. Please try again.")
     }
   }
 

@@ -36,6 +36,8 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon, Plus, Trash2 } from "lucide-react"
 import { createCommand, updateCommand } from "@/app/actions/commands"
+import { useToast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 import { ProthesisType, PaymentMode, Product, User, Command } from "@/app/generated/prisma/browser"
 
 // Define the shape of the command with its relations as expected by the dialog
@@ -75,6 +77,8 @@ interface CommandDialogProps {
 export function CommandDialog({ command, trigger, productsList, usersList }: CommandDialogProps) {
   const [open, setOpen] = useState(false)
   const isEditing = !!command
+  const toast = useToast()
+  const router = useRouter()
 
   const form = useForm<CommandFormValues>({
     resolver: zodResolver(commandSchema),
@@ -110,15 +114,23 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
         ...data,
         instrumentisteId: data.instrumentisteId ? parseInt(data.instrumentisteId) : undefined
       }
-      if (isEditing && command && command.id) {
-        await updateCommand(command.id, submitData as any)
+      const result =
+        isEditing && command && command.id
+          ? await updateCommand(command.id, submitData as any)
+          : await createCommand(submitData as any)
+
+      if (result?.success) {
+        toast.success(isEditing ? "Command updated." : "Command created.")
+        setOpen(false)
+        form.reset()
+        router.refresh()
       } else {
-        await createCommand(submitData as any)
+        // Keep the dialog open so the user can fix the input and retry.
+        toast.error(result?.message || "Something went wrong. Please try again.")
       }
-      setOpen(false)
-      form.reset()
     } catch (error) {
       console.error(error)
+      toast.error("Something went wrong. Please try again.")
     }
   }
 
@@ -126,23 +138,15 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button
-            style={{
-              backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
-              boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
-              borderRadius: '10px',
-              color: '#FFFFFF',
-            }}
-            className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
-          >
+          <Button>
             <Plus className="mr-2 h-4 w-4" /> Create Command
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto" style={{ borderRadius: '16px' }}>
         <DialogHeader>
-          <DialogTitle style={{ fontFamily: 'var(--font-dm-serif)', fontSize: '26px', color: '#1A2332' }}>{isEditing ? "Edit Command" : "Create Command"}</DialogTitle>
-          <DialogDescription style={{ color: '#94A3B8', fontSize: '13px' }}>
+          <DialogTitle style={{ fontFamily: 'var(--font-dm-serif)', fontSize: '26px' }} className="text-foreground">{isEditing ? "Edit Command" : "Create Command"}</DialogTitle>
+          <DialogDescription style={{ fontSize: '13px' }} className="text-muted-foreground">
             {isEditing
               ? "Update command details."
               : "Create a new command."}
@@ -262,7 +266,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                               "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
-                            style={{ borderRadius: '10px', borderColor: '#E8ECF0', backgroundColor: '#FFFFFF' }}
+                            style={{ borderRadius: '10px' }}
                                 >
                                 {field.value ? (
                                     format(field.value, "PPP")
@@ -304,7 +308,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                                     "w-full pl-3 text-left font-normal",
                                     !field.value && "text-muted-foreground"
                                 )}
-                            style={{ borderRadius: '10px', borderColor: '#E8ECF0', backgroundColor: '#FFFFFF' }}
+                            style={{ borderRadius: '10px' }}
                                 >
                                 {field.value ? (
                                     format(field.value, "PPP")
@@ -390,7 +394,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                         type="button"
                       variant="outline"
                         size="sm"
-                      style={{ borderRadius: '10px', borderColor: '#E8ECF0' }}
+                      style={{ borderRadius: '10px' }}
                         onClick={() => append({ productId: productsList[0]?.id || 0, quantity: 1 })}
                     >
                         Add Product
@@ -471,17 +475,8 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
             />
 
             <DialogFooter>
-              <Button
-                type="submit"
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
-                  boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
-                  borderRadius: '10px',
-                  color: '#FFFFFF',
-                }}
-                className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
-              >
-                Save Command
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Saving…" : "Save Command"}
               </Button>
             </DialogFooter>
           </form>

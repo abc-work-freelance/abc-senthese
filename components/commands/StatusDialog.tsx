@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { updateCommandStatus } from "@/app/actions/commands"
+import { useToast } from "@/components/ui/toast"
 import { CommandStatus } from "@/app/generated/prisma/browser"
 import { Activity } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -33,17 +34,26 @@ interface StatusDialogProps {
 export function StatusDialog({ id, currentStatus, allowedStatuses, trigger }: StatusDialogProps) {
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<CommandStatus>(currentStatus)
+  const [saving, setSaving] = useState(false)
+  const toast = useToast()
   const router = useRouter()
 
   const handleUpdate = async () => {
+    setSaving(true)
     try {
       const result = await updateCommandStatus(id, status)
       if (result.success) {
+        toast.success("Status updated.")
         setOpen(false)
         router.refresh()
+      } else {
+        toast.error(result.message || "Failed to update status.")
       }
     } catch (error) {
       console.error("Failed to update status", error)
+      toast.error("Failed to update status. Please try again.")
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -60,8 +70,8 @@ export function StatusDialog({ id, currentStatus, allowedStatuses, trigger }: St
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" style={{ borderRadius: '16px' }}>
         <DialogHeader>
-          <DialogTitle style={{ fontFamily: 'var(--font-dm-serif)', fontSize: '24px', color: '#1A2332' }}>Update Status</DialogTitle>
-          <DialogDescription style={{ color: '#94A3B8', fontSize: '13px' }}>
+          <DialogTitle style={{ fontFamily: 'var(--font-dm-serif)', fontSize: '24px' }} className="text-foreground">Update Status</DialogTitle>
+          <DialogDescription style={{ fontSize: '13px' }} className="text-muted-foreground">
             Change the status of this command.
           </DialogDescription>
         </DialogHeader>
@@ -78,17 +88,8 @@ export function StatusDialog({ id, currentStatus, allowedStatuses, trigger }: St
             </Select>
         </div>
         <DialogFooter>
-          <Button
-            onClick={handleUpdate}
-            style={{
-              backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
-              boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
-              borderRadius: '10px',
-              color: '#FFFFFF',
-            }}
-            className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
-          >
-            Update Status
+          <Button onClick={handleUpdate} disabled={saving}>
+            {saving ? "Updating…" : "Update Status"}
           </Button>
         </DialogFooter>
       </DialogContent>

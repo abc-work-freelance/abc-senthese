@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { createProduct, updateProduct } from "@/app/actions/products"
+import { useToast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 import { Product } from "@/app/generated/prisma/browser"
 import { Plus, Pencil } from "lucide-react"
 
@@ -35,6 +37,8 @@ interface ProductDialogProps {
 export function ProductDialog({ product, trigger }: ProductDialogProps) {
   const [open, setOpen] = useState(false)
   const isEditing = !!product
+  const toast = useToast()
+  const router = useRouter()
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -46,15 +50,22 @@ export function ProductDialog({ product, trigger }: ProductDialogProps) {
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
-      if (isEditing && product) {
-        await updateProduct(product.id, data)
+      const result =
+        isEditing && product
+          ? await updateProduct(product.id, data)
+          : await createProduct(data)
+
+      if (result?.success) {
+        toast.success(isEditing ? "Product updated." : "Product created.")
+        setOpen(false)
+        form.reset(isEditing ? data : { code: "", name: "" })
+        router.refresh()
       } else {
-        await createProduct(data)
+        toast.error(result?.message || "Something went wrong. Please try again.")
       }
-      setOpen(false)
-      form.reset()
     } catch (error) {
       console.error(error)
+      toast.error("Something went wrong. Please try again.")
     }
   }
 
@@ -105,7 +116,9 @@ export function ProductDialog({ product, trigger }: ProductDialogProps) {
               )}
             />
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Saving…" : "Save changes"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

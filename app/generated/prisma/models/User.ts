@@ -246,6 +246,7 @@ export type UserWhereInput = {
   approved?: Prisma.BoolFilter<"User"> | boolean
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
+  resetTokens?: Prisma.PasswordResetTokenListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -260,6 +261,7 @@ export type UserOrderByWithRelationInput = {
   approved?: Prisma.SortOrder
   createdCommands?: Prisma.CommandOrderByRelationAggregateInput
   assignedCommands?: Prisma.CommandOrderByRelationAggregateInput
+  resetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -277,6 +279,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   approved?: Prisma.BoolFilter<"User"> | boolean
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
+  resetTokens?: Prisma.PasswordResetTokenListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -322,6 +325,7 @@ export type UserCreateInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -336,6 +340,7 @@ export type UserUncheckedCreateInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -349,6 +354,7 @@ export type UserUpdateInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -363,6 +369,7 @@ export type UserUncheckedUpdateInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -450,14 +457,14 @@ export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
-}
-
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type UserCreatepermissionsInput = {
@@ -493,6 +500,20 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type UserCreateNestedOneWithoutResetTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResetTokensInput, Prisma.UserUncheckedCreateWithoutResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutResetTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutResetTokensInput, Prisma.UserUncheckedCreateWithoutResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutResetTokensInput
+  upsert?: Prisma.UserUpsertWithoutResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutResetTokensInput, Prisma.UserUpdateWithoutResetTokensInput>, Prisma.UserUncheckedUpdateWithoutResetTokensInput>
+}
+
 export type UserCreateNestedOneWithoutAssignedCommandsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedCommandsInput, Prisma.UserUncheckedCreateWithoutAssignedCommandsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedCommandsInput
@@ -523,6 +544,76 @@ export type UserUpdateOneRequiredWithoutCreatedCommandsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedCommandsInput, Prisma.UserUpdateWithoutCreatedCommandsInput>, Prisma.UserUncheckedUpdateWithoutCreatedCommandsInput>
 }
 
+export type UserCreateWithoutResetTokensInput = {
+  name: string
+  familyName: string
+  role: $Enums.UserRole
+  email: string
+  password: string
+  phone?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
+  createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
+  assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
+}
+
+export type UserUncheckedCreateWithoutResetTokensInput = {
+  id?: number
+  name: string
+  familyName: string
+  role: $Enums.UserRole
+  email: string
+  password: string
+  phone?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
+  createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
+}
+
+export type UserCreateOrConnectWithoutResetTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutResetTokensInput, Prisma.UserUncheckedCreateWithoutResetTokensInput>
+}
+
+export type UserUpsertWithoutResetTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutResetTokensInput, Prisma.UserUncheckedUpdateWithoutResetTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutResetTokensInput, Prisma.UserUncheckedCreateWithoutResetTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutResetTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutResetTokensInput, Prisma.UserUncheckedUpdateWithoutResetTokensInput>
+}
+
+export type UserUpdateWithoutResetTokensInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  familyName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
+  assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
+}
+
+export type UserUncheckedUpdateWithoutResetTokensInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  familyName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
+}
+
 export type UserCreateWithoutAssignedCommandsInput = {
   name: string
   familyName: string
@@ -533,6 +624,7 @@ export type UserCreateWithoutAssignedCommandsInput = {
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
   approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
+  resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedCommandsInput = {
@@ -546,6 +638,7 @@ export type UserUncheckedCreateWithoutAssignedCommandsInput = {
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
   approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedCommandsInput = {
@@ -563,6 +656,7 @@ export type UserCreateWithoutCreatedCommandsInput = {
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
   approved?: boolean
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCommandsInput = {
@@ -576,6 +670,7 @@ export type UserUncheckedCreateWithoutCreatedCommandsInput = {
   permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
   approved?: boolean
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCommandsInput = {
@@ -604,6 +699,7 @@ export type UserUpdateWithoutAssignedCommandsInput = {
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedCommandsInput = {
@@ -617,6 +713,7 @@ export type UserUncheckedUpdateWithoutAssignedCommandsInput = {
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedCommandsInput = {
@@ -640,6 +737,7 @@ export type UserUpdateWithoutCreatedCommandsInput = {
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
@@ -653,6 +751,7 @@ export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
   permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -663,11 +762,13 @@ export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
 export type UserCountOutputType = {
   createdCommands: number
   assignedCommands: number
+  resetTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdCommands?: boolean | UserCountOutputTypeCountCreatedCommandsArgs
   assignedCommands?: boolean | UserCountOutputTypeCountAssignedCommandsArgs
+  resetTokens?: boolean | UserCountOutputTypeCountResetTokensArgs
 }
 
 /**
@@ -694,6 +795,13 @@ export type UserCountOutputTypeCountAssignedCommandsArgs<ExtArgs extends runtime
   where?: Prisma.CommandWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetTokenWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -707,6 +815,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   approved?: boolean
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
+  resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -750,6 +859,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
+  resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -760,6 +870,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     createdCommands: Prisma.$CommandPayload<ExtArgs>[]
     assignedCommands: Prisma.$CommandPayload<ExtArgs>[]
+    resetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1167,6 +1278,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   createdCommands<T extends Prisma.User$createdCommandsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdCommandsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedCommands<T extends Prisma.User$assignedCommandsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedCommandsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  resetTokens<T extends Prisma.User$resetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$resetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1638,6 +1750,30 @@ export type User$assignedCommandsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.CommandScalarFieldEnum | Prisma.CommandScalarFieldEnum[]
+}
+
+/**
+ * User.resetTokens
+ */
+export type User$resetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordResetToken
+   */
+  select?: Prisma.PasswordResetTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordResetToken
+   */
+  omit?: Prisma.PasswordResetTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetTokenInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetTokenWhereInput
+  orderBy?: Prisma.PasswordResetTokenOrderByWithRelationInput | Prisma.PasswordResetTokenOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
 }
 
 /**

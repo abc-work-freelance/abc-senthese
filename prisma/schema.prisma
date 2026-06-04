@@ -75,8 +75,25 @@ model User {
   // Relations
   createdCommands  Command[] @relation("CreatedByAdmin")
   assignedCommands Command[] @relation("AssignedToInstrumentiste")
+  resetTokens      PasswordResetToken[]
 
   @@map("users")
+}
+
+// Short-lived one-time codes for the "forgot password" flow. The 6-digit code
+// is never stored in plaintext — only its bcrypt hash. Tokens are single-use
+// and expire quickly; brute-force is bounded by the attempts counter.
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model Command {

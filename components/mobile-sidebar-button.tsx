@@ -1,43 +1,37 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
-import { AppSidebarContent } from "./app-sidebar-content"
+import { Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { AppSidebarContent, type SidebarCounts } from "./app-sidebar-content"
 
 interface MobileSidebarButtonProps {
   role?: "ADMIN" | "INSTRUMENTISTE" | null
   email?: string | null
+  name?: string | null
+  initials?: string
   isSuperAdmin?: boolean
+  counts?: SidebarCounts
 }
 
-export function MobileSidebarButton({ role, email, isSuperAdmin }: MobileSidebarButtonProps) {
+export function MobileSidebarButton(props: MobileSidebarButtonProps) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex lg:hidden h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-white transition-colors hover:bg-white/10"
-        style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
+        className="tbtn mobile-menu-btn"
         aria-label="Open menu"
+        type="button"
       >
-        <Menu className="h-5 w-5" />
+        <Menu strokeWidth={2} />
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle>ABC SYNTHESE</SheetTitle>
-          </SheetHeader>
-          <div className="overflow-y-auto h-full">
-            <AppSidebarContent role={role} email={email} isSuperAdmin={isSuperAdmin} onNavigate={() => setOpen(false)} />
-          </div>
+        <SheetContent side="left" className="sidebar w-64 border-0 p-0">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <AppSidebarContent {...props} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
     </>

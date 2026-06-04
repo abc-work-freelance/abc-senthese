@@ -765,10 +765,6 @@ export type EnumProthesisTypeFieldUpdateOperationsInput = {
   set?: $Enums.ProthesisType
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type EnumPaymentModeFieldUpdateOperationsInput = {
   set?: $Enums.PaymentMode
 }

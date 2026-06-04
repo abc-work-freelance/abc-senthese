@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma"
 import { CommandDialog } from "@/components/commands/CommandDialog"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getEffectivePermissions } from "@/lib/permissions"
 import { UserRole, CommandStatus } from "@/app/generated/prisma/client"
+import { format } from "date-fns"
 import { CommandsTable } from "./CommandsTable"
 import CardsSection from "./CardsSection"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 import { ChartsSection } from "@/components/commands/ChartsSection"
+import CadenceCard from "./CadenceCard"
 import RightPanel from "./RightPanel"
 
 type DashboardCommand = {
@@ -39,39 +40,76 @@ type DashboardCommand = {
   } | null
 }
 
-export default async function CommandsPage() {
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+function shortName(name?: string | null, familyName?: string | null) {
+  const first = name?.[0]
+  if (first && familyName) return `${first}. ${familyName}`
+  return name || familyName || "—"
+}
+
+function initialsOf(name?: string | null, familyName?: string | null) {
+  return `${name?.[0] ?? ""}${familyName?.[0] ?? ""}`.toUpperCase() || "?"
+}
+
+export default async function CommandsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q: searchQuery } = await searchParams
   const session = await getServerSession(authOptions)
   const role = session?.user?.role
   const userId = session?.user?.id
+  const isAdmin = role === UserRole.ADMIN
+  const permissions = isAdmin ? await getEffectivePermissions() : []
+  const perms = {
+    canCreate: permissions.includes("COMMAND_CREATE"),
+    canUpdate: permissions.includes("COMMAND_UPDATE"),
+    canDelete: permissions.includes("COMMAND_DELETE"),
+    canStatus: permissions.includes("COMMAND_STATUS_UPDATE"),
+  }
 
   let commands: DashboardCommand[] = []
-  
+
   if (role === UserRole.ADMIN) {
-     const res = await getAllCommands()
-      commands = res.commands as DashboardCommand[]
+    const res = await getAllCommands()
+    commands = res.commands as DashboardCommand[]
   } else if (role === UserRole.INSTRUMENTISTE && userId) {
-     const res = await getAllCommands()
-      const allowedStatuses = [CommandStatus.AFFECTEE, CommandStatus.COMPLETEE, CommandStatus.ANNULEE] as const
-      commands = (res.commands as DashboardCommand[] | undefined)?.filter(
+    const res = await getAllCommands()
+    const allowedStatuses = [CommandStatus.AFFECTEE, CommandStatus.COMPLETEE, CommandStatus.ANNULEE] as const
+    commands =
+      (res.commands as DashboardCommand[] | undefined)?.filter(
         (command) =>
           command.instrumentisteId === parseInt(userId) &&
-          allowedStatuses.includes(command.status as any)
+          allowedStatuses.includes(command.status as (typeof allowedStatuses)[number])
       ) || []
   }
 
   const { products } = await getAllProducts()
-  const users = await prisma.user.findMany({
-      where: { role: UserRole.INSTRUMENTISTE }
-  })
+  const users = await prisma.user.findMany({ where: { role: UserRole.INSTRUMENTISTE } })
+  const userMap = new Map(users.map((u) => [u.id, u]))
 
   const commandsStat = await prisma.command.findMany({
-    where:
-      role === UserRole.INSTRUMENTISTE && userId
-        ? { instrumentisteId: parseInt(userId) }
-        : undefined,
+    where: role === UserRole.INSTRUMENTISTE && userId ? { instrumentisteId: parseInt(userId) } : undefined,
   })
-  const panelCommands = (role === UserRole.ADMIN ? commandsStat : commands) as DashboardCommand[]
 
+  // ---- date scaffolding ----
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+  const weekFromToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7)
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)
+  const dow = (startOfToday.getDay() + 6) % 7 // 0 = Monday
+  const monday = new Date(startOfToday)
+  monday.setDate(startOfToday.getDate() - dow)
+
+  const dateOf = (c: { dateIntervention: Date | string }) => new Date(c.dateIntervention)
+  const inRange = (d: Date, start: Date, end: Date) => d >= start && d < end
+
+  // ---- prosthesis mix ----
   const typeCounts = commandsStat.reduce(
     (acc, command) => {
       if (command.type === "HIP") acc.hip += 1
@@ -82,91 +120,137 @@ export default async function CommandsPage() {
     { hip: 0, knee: 0, shoulder: 0 }
   )
 
-  const topCommands = [...commandsStat]
-    .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime())
+  // ---- KPIs ----
+  const activeCommands = commandsStat.filter((c) => c.status !== "COMPLETEE" && c.status !== "ANNULEE").length
+  const awaitingAssignment = commandsStat.filter((c) => c.status === "VALIDEE").length
+
+  const todayCommands = commandsStat
+    .filter((c) => c.dateIntervention && inRange(dateOf(c), startOfToday, endOfToday))
+    .sort((a, b) => dateOf(a).getTime() - dateOf(b).getTime())
+  const interventionsToday = todayCommands.length
+  const upcomingToday = todayCommands.find((c) => dateOf(c) >= now) ?? todayCommands[0]
+  const next = upcomingToday
+    ? {
+        time: format(dateOf(upcomingToday), "HH:mm"),
+        place: upcomingToday.clinique || upcomingToday.ville || "—",
+      }
+    : null
+
+  const dueThisWeekCommands = commandsStat.filter(
+    (c) => c.dateIntervention && inRange(dateOf(c), startOfToday, weekFromToday)
+  )
+  const dueThisWeek = dueThisWeekCommands.length
+  const notScheduled = dueThisWeekCommands.filter((c) => c.status === "VALIDEE").length
+
+  const monthCommands = commandsStat.filter((c) => c.dateIntervention && inRange(dateOf(c), monthStart, monthEnd))
+  const completedCount = monthCommands.filter((c) => c.status === "COMPLETEE").length
+  const monthTotal = monthCommands.length
+  const completionRate = monthTotal > 0 ? Math.round((completedCount / monthTotal) * 100) : 0
+
+  const kpi = {
+    activeCommands,
+    awaitingAssignment,
+    interventionsToday,
+    next,
+    dueThisWeek,
+    notScheduled,
+    completionRate,
+    completedCount,
+    monthTotal,
+    monthName: format(now, "MMMM"),
+  }
+
+  // ---- cadence (this week) ----
+  const days = WEEKDAYS.map((label, i) => {
+    const dayStart = new Date(monday)
+    dayStart.setDate(monday.getDate() + i)
+    const dayEnd = new Date(dayStart)
+    dayEnd.setDate(dayStart.getDate() + 1)
+    const value = commandsStat.filter((c) => c.dateIntervention && inRange(dateOf(c), dayStart, dayEnd)).length
+    return { label, value }
+  })
+  const scheduled = days.reduce((sum, d) => sum + d.value, 0)
+  const cadence = {
+    days,
+    todayIndex: dow,
+    scheduled,
+    today: interventionsToday,
+    dailyAvg: (scheduled / 7).toFixed(1),
+  }
+
+  // ---- right rail ----
+  const schedule = todayCommands.map((c) => {
+    const inst = c.instrumentisteId ? userMap.get(c.instrumentisteId) : null
+    const place = c.clinique || c.ville || "—"
+    return {
+      time: format(dateOf(c), "HH:mm"),
+      type: c.type,
+      doctor: c.doctorName || "Intervention",
+      meta: inst ? `${place} · ${shortName(inst.name, inst.familyName)}` : place,
+    }
+  })
+
+  const ops = {
+    awaitingValidation: commandsStat.filter((c) => c.status === "VALIDEE").length,
+    reportedOnHold: commandsStat.filter((c) => c.status === "REPORTEE").length,
+    cancelled30d: commandsStat.filter((c) => c.status === "ANNULEE" && new Date(c.updatedAt) >= thirtyDaysAgo).length,
+    reportsPending: commandsStat.filter((c) => c.status === "COMPLETEE" && !c.completionReport).length,
+  }
+
+  const loadCounts = new Map<number, number>()
+  for (const c of commandsStat) {
+    if (c.status === "AFFECTEE" && c.instrumentisteId) {
+      loadCounts.set(c.instrumentisteId, (loadCounts.get(c.instrumentisteId) ?? 0) + 1)
+    }
+  }
+  const load = [...loadCounts.entries()]
+    .map(([id, active]) => {
+      const u = userMap.get(id)
+      return { initials: initialsOf(u?.name, u?.familyName), name: shortName(u?.name, u?.familyName), active }
+    })
+    .sort((a, b) => b.active - a.active)
     .slice(0, 4)
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
-      <div className="space-y-6 min-w-0">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <div className="text-[26px] font-semibold leading-tight text-[#1A2332]" style={{ fontFamily: 'var(--font-dm-serif)' }}>
-              Command intelligence
-            </div>
-            <p className="max-w-2xl text-[13px] text-[#94A3B8]">
-              Monitor surgical prosthetics commands, interventions, and operational status in a refined clinical workspace.
-            </p>
-          </div>
-
-          {role === UserRole.ADMIN && (
-            <CommandDialog
-              productsList={products || []}
-              usersList={users || []}
-              trigger={
-                <Button
-                  style={{
-                    backgroundImage: 'linear-gradient(135deg, #00C49A 0%, #0EA5E9 100%)',
-                    boxShadow: '0 4px 14px rgba(0,196,154,0.3)',
-                    borderRadius: '10px',
-                    color: '#FFFFFF',
-                  }}
-                  className="hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(0,196,154,0.28)]"
-                >
-                  <Plus className="mr-2 h-4 w-4" /> New Command
-                </Button>
-              }
-            />
-          )}
+    <>
+      <div className="page-head">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-desc">
+            {format(now, "EEEE, d MMMM yyyy")} · {interventionsToday} intervention
+            {interventionsToday === 1 ? "" : "s"} scheduled today
+          </p>
         </div>
-
-        <CardsSection
-          data={{
-            total: commandsStat.length,
-            affectee: commandsStat.filter(x => x.status == "AFFECTEE").length,
-            completee: commandsStat.filter(x => x.status == "COMPLETEE").length,
-            validee: commandsStat.filter(x => x.status == "VALIDEE").length
-          }}
-        />
-
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.9fr)]">
-          <ChartsSection data={typeCounts} />
-
-          <div className="rounded-xl border border-[#E8ECF0] bg-white p-5 shadow-[0_18px_40px_rgba(13,27,46,0.05)]">
-            <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#94A3B8]">Command cadence</div>
-            <h3 className="mt-1 text-[20px] font-semibold text-[#1A2332]">Latest updates</h3>
-            <div className="mt-4 space-y-3">
-              {topCommands.map((command) => (
-                <div key={command.id} className="rounded-[12px] border border-[#E8ECF0] bg-[#F8FAFC] p-3">
-                  <div className="text-sm font-semibold text-[#1A2332]">{command.reference}</div>
-                  <div className="mt-1 text-xs text-[#94A3B8]">
-                    {command.doctorName || 'No doctor'}
-                    {command.clinique ? ` · ${command.clinique}` : ''}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div id="commands" className="space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-[20px] font-semibold text-[#1A2332]">Commands</h2>
-              <p className="text-[13px] text-[#94A3B8]">Review, filter, and update command records.</p>
-            </div>
-          </div>
-
-          <CommandsTable 
-            data={commands || []} 
-            products={products || []}
-            users={users || []}
-            isAdmin={role === UserRole.ADMIN}
+        {isAdmin && perms.canCreate && (
+          <CommandDialog
+            productsList={products || []}
+            usersList={users || []}
+            trigger={
+              <button className="btn btn-primary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                New command
+              </button>
+            }
           />
-        </div>
+        )}
       </div>
 
-      <RightPanel commands={panelCommands} users={users} />
-    </div>
+      <div className="grid-main">
+        <div className="col-left">
+          <CardsSection data={kpi} />
+
+          <div className="row-mid">
+            <ChartsSection data={typeCounts} />
+            <CadenceCard data={cadence} />
+          </div>
+
+          <CommandsTable data={commands || []} products={products || []} users={users || []} isAdmin={isAdmin} perms={perms} query={searchQuery} />
+        </div>
+
+        <RightPanel data={{ schedule, ops, load }} />
+      </div>
+    </>
   )
 }

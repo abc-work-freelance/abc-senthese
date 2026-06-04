@@ -1,27 +1,34 @@
-import { DataTable } from "@/components/ui/data-table"
-import { columns } from "@/components/products/columns"
 import { getAllProducts } from "@/app/actions/products"
 import { ProductDialog } from "@/components/products/ProductDialog"
+import { ProductsTable } from "@/components/products/ProductsTable"
+import { getEffectivePermissions } from "@/lib/permissions"
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
   const { products } = await getAllProducts()
+  const permissions = await getEffectivePermissions()
+  const canCreate = permissions.includes("PRODUCT_CREATE")
+  const canUpdate = permissions.includes("PRODUCT_UPDATE")
+  const canDelete = permissions.includes("PRODUCT_DELETE")
 
   return (
-    <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="flex-1 flex-col space-y-6 md:flex">
+      <div className="page-head">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Products</h2>
-          <p className="text-muted-foreground">
-            Manage your product inventory here.
-          </p>
+          <h1 className="page-title">Products</h1>
+          <p className="page-desc">Manage your product inventory here.</p>
         </div>
-        <ProductDialog />
+        {canCreate && <ProductDialog />}
       </div>
-      <DataTable 
-        data={products || []} 
-        columns={columns} 
-        searchKey="name"
-        searchPlaceholder="Filter products..."
+      <ProductsTable
+        data={products || []}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+        initialSearch={q}
       />
     </div>
   )

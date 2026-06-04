@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
+import { isUniqueConstraintError, isRecordNotFoundError } from "@/lib/prisma-errors"
 import { broadcastEntityChange } from "@/lib/ws-notify"
 
 export type CreateProductInput = {
@@ -43,7 +44,10 @@ export async function createProduct(data: CreateProductInput) {
     return { success: true, product }
   } catch (error) {
     console.error("Create product error:", error)
-    return { success: false, message: "Failed to create product" }
+    if (isUniqueConstraintError(error, "code")) {
+      return { success: false, message: `A product with code "${data.code}" already exists.` }
+    }
+    return { success: false, message: "Failed to create product. Please try again." }
   }
 }
 
@@ -70,7 +74,13 @@ export async function updateProduct(id: number, data: UpdateProductInput) {
     return { success: true, product }
   } catch (error) {
     console.error("Update product error:", error)
-    return { success: false, message: "Failed to update product" }
+    if (isUniqueConstraintError(error, "code")) {
+      return { success: false, message: `A product with code "${data.code}" already exists.` }
+    }
+    if (isRecordNotFoundError(error)) {
+      return { success: false, message: "This product no longer exists. It may have been deleted." }
+    }
+    return { success: false, message: "Failed to update product. Please try again." }
   }
 }
 
@@ -135,6 +145,9 @@ export async function deleteProduct(id: number) {
     return { success: true, message: "Product deleted successfully" }
   } catch (error) {
     console.error("Delete product error:", error)
-    return { success: false, message: "Failed to delete product" }
+    if (isRecordNotFoundError(error)) {
+      return { success: false, message: "This product has already been deleted." }
+    }
+    return { success: false, message: "Failed to delete product. Please try again." }
   }
 }
