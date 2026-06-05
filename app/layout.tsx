@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { PushNotificationsClient } from "@/components/PushNotificationsClient";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body className={`${plexSans.variable} ${plexMono.variable} ${dmSerif.variable} antialiased`}>
         <PushNotificationsClient />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
