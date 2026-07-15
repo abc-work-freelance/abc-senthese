@@ -4,12 +4,13 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { Download, ListFilter, MoreVertical, X } from "lucide-react"
-import { Product, User, CommandStatus, ProthesisType } from "@/app/generated/prisma/browser"
+import { Product, User, CommandStatus, ProthesisType, PaymentMode } from "@/app/generated/prisma/browser"
 import { CommandDialog } from "@/components/commands/CommandDialog"
 import { DeleteCommandDialog } from "@/components/commands/DeleteCommandDialog"
 import { StatusDialog } from "@/components/commands/StatusDialog"
 import { UploadReportDialog } from "@/components/commands/UploadReportDialog"
 import { SquarePen, Activity, Link2 } from "lucide-react"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
 type CommandRow = {
   id: number
@@ -99,19 +100,52 @@ type SegmentKey = (typeof SEGMENTS)[number]["key"]
 export function CommandsTable({ data, products, users, isAdmin, perms, query }: CommandsTableProps) {
   const router = useRouter()
   const [segment, setSegment] = useState<SegmentKey>("ALL")
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filterType, setFilterType] = useState<"ALL" | ProthesisType>("ALL")
+  const [filterPayment, setFilterPayment] = useState<"ALL" | string>("ALL")
+  const [filterDateFrom, setFilterDateFrom] = useState("")
+  const [filterDateTo, setFilterDateTo] = useState("")
   const canUpdate = perms?.canUpdate ?? false
   const canDelete = perms?.canDelete ?? false
   const canStatus = perms?.canStatus ?? false
 
   const trimmedQuery = query?.trim().toLowerCase() ?? ""
 
-  // When searching, results span every status so the match is never hidden by
-  // the status segment; otherwise fall back to the segment filter.
-  const rows = trimmedQuery
+  const activeFilters =
+    (filterType !== "ALL" ? 1 : 0) +
+    (filterPayment !== "ALL" ? 1 : 0) +
+    (filterDateFrom ? 1 : 0) +
+    (filterDateTo ? 1 : 0)
+
+  // Start with free-text search or segment filter
+  let rows = trimmedQuery
     ? data.filter((row) => commandMatchesQuery(row, trimmedQuery))
     : segment === "ALL"
       ? data
       : data.filter((row) => row.status === segment)
+
+  // Stack advanced filters on top
+  if (filterType !== "ALL") {
+    rows = rows.filter((row) => row.type === filterType)
+  }
+  if (filterPayment !== "ALL") {
+    rows = rows.filter((row) => row.modePaiement === filterPayment)
+  }
+  if (filterDateFrom) {
+    const from = new Date(filterDateFrom).getTime()
+    rows = rows.filter((row) => new Date(row.dateIntervention).getTime() >= from)
+  }
+  if (filterDateTo) {
+    const to = new Date(filterDateTo).setHours(23, 59, 59, 999)
+    rows = rows.filter((row) => new Date(row.dateIntervention).getTime() <= to)
+  }
+
+  const resetFilters = () => {
+    setFilterType("ALL")
+    setFilterPayment("ALL")
+    setFilterDateFrom("")
+    setFilterDateTo("")
+  }
 
   const handleExport = async () => {
     const XLSX = await import("xlsx")
@@ -165,10 +199,53 @@ export function CommandsTable({ data, products, users, isAdmin, perms, query }: 
           </button>
         )}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          <button className="filter-chip" type="button" disabled aria-hidden>
-            <ListFilter />
-            Filter
-          </button>
+          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+            <PopoverTrigger asChild>
+              <button className="filter-chip" type="button">
+                <ListFilter />
+                Filter
+                {activeFilters > 0 && <span className="filter-badge">{activeFilters}</span>}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="filter-panel">
+              <div className="filter-panel-header">
+                <span className="filter-panel-title">Filters</span>
+                {activeFilters > 0 && (
+                  <button className="filter-reset-btn" type="button" onClick={resetFilters}>
+                    <X /> Reset
+                  </button>
+                )}
+              </div>
+              <div className="filter-panel-body">
+                <label className="filter-label">
+                  <span>Type</span>
+                  <select value={filterType} onChange={(e) => setFilterType(e.target.value as any)}>
+                    <option value="ALL">All</option>
+                    {Object.values(ProthesisType).map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="filter-label">
+                  <span>Payment</span>
+                  <select value={filterPayment} onChange={(e) => setFilterPayment(e.target.value)}>
+                    <option value="ALL">All</option>
+                    {Object.values(PaymentMode).map((m) => (
+                      <option key={m} value={m}>{m.replace(/_/g, " ")}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="filter-label">
+                  <span>Date from</span>
+                  <input type="date" value={filterDateFrom} onChange={(e) => setFilterDateFrom(e.target.value)} />
+                </label>
+                <label className="filter-label">
+                  <span>Date to</span>
+                  <input type="date" value={filterDateTo} onChange={(e) => setFilterDateTo(e.target.value)} />
+                </label>
+              </div>
+            </PopoverContent>
+          </Popover>
           <button className="filter-chip" type="button" onClick={handleExport} disabled={rows.length === 0}>
             <Download />
             Export

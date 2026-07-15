@@ -2,6 +2,7 @@ export type EntityChangeNotification = {
   entity: "command" | "product"
   action: "created" | "updated" | "deleted" | "status_changed"
   id: number
+  targetUserId?: number
 }
 
 import { prisma } from "@/lib/prisma"
@@ -44,7 +45,14 @@ export function broadcastEntityChange(payload: EntityChangeNotification) {
 }
 
 async function sendPushNotifications(payload: EntityChangeNotification) {
-  const subscriptions = await prisma.pushSubscription.findMany()
+  const where: any = {}
+  if (payload.targetUserId) {
+    where.userId = payload.targetUserId
+  }
+
+  const subscriptions = await prisma.pushSubscription.findMany({
+    where,
+  })
 
   const title =
     payload.entity === "command" ? "Command update" : "Product update"
@@ -81,5 +89,3 @@ async function sendPushNotifications(payload: EntityChangeNotification) {
     }
   }
 }
-
-

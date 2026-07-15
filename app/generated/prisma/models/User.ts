@@ -247,6 +247,7 @@ export type UserWhereInput = {
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
   resetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -262,6 +263,7 @@ export type UserOrderByWithRelationInput = {
   createdCommands?: Prisma.CommandOrderByRelationAggregateInput
   assignedCommands?: Prisma.CommandOrderByRelationAggregateInput
   resetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
+  pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -280,6 +282,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdCommands?: Prisma.CommandListRelationFilter
   assignedCommands?: Prisma.CommandListRelationFilter
   resetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -326,6 +329,7 @@ export type UserCreateInput = {
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
   resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -341,6 +345,7 @@ export type UserUncheckedCreateInput = {
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -355,6 +360,7 @@ export type UserUpdateInput = {
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
   resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -370,6 +376,7 @@ export type UserUncheckedUpdateInput = {
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -544,6 +551,22 @@ export type UserUpdateOneRequiredWithoutCreatedCommandsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedCommandsInput, Prisma.UserUpdateWithoutCreatedCommandsInput>, Prisma.UserUncheckedUpdateWithoutCreatedCommandsInput>
 }
 
+export type UserCreateNestedOneWithoutPushSubscriptionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutPushSubscriptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput
+  upsert?: Prisma.UserUpsertWithoutPushSubscriptionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPushSubscriptionsInput, Prisma.UserUpdateWithoutPushSubscriptionsInput>, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
+}
+
 export type UserCreateWithoutResetTokensInput = {
   name: string
   familyName: string
@@ -555,6 +578,7 @@ export type UserCreateWithoutResetTokensInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutResetTokensInput = {
@@ -569,6 +593,7 @@ export type UserUncheckedCreateWithoutResetTokensInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutResetTokensInput = {
@@ -598,6 +623,7 @@ export type UserUpdateWithoutResetTokensInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutResetTokensInput = {
@@ -612,6 +638,7 @@ export type UserUncheckedUpdateWithoutResetTokensInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedCommandsInput = {
@@ -625,6 +652,7 @@ export type UserCreateWithoutAssignedCommandsInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
   resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedCommandsInput = {
@@ -639,6 +667,7 @@ export type UserUncheckedCreateWithoutAssignedCommandsInput = {
   approved?: boolean
   createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedCommandsInput = {
@@ -657,6 +686,7 @@ export type UserCreateWithoutCreatedCommandsInput = {
   approved?: boolean
   assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
   resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCommandsInput = {
@@ -671,6 +701,7 @@ export type UserUncheckedCreateWithoutCreatedCommandsInput = {
   approved?: boolean
   assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCommandsInput = {
@@ -700,6 +731,7 @@ export type UserUpdateWithoutAssignedCommandsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
   resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedCommandsInput = {
@@ -714,6 +746,7 @@ export type UserUncheckedUpdateWithoutAssignedCommandsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedCommandsInput = {
@@ -738,6 +771,7 @@ export type UserUpdateWithoutCreatedCommandsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
   resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
@@ -752,6 +786,81 @@ export type UserUncheckedUpdateWithoutCreatedCommandsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
   resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPushSubscriptionsInput = {
+  name: string
+  familyName: string
+  role: $Enums.UserRole
+  email: string
+  password: string
+  phone?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
+  createdCommands?: Prisma.CommandCreateNestedManyWithoutCreatedByInput
+  assignedCommands?: Prisma.CommandCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
+  id?: number
+  name: string
+  familyName: string
+  role: $Enums.UserRole
+  email: string
+  password: string
+  phone?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | $Enums.Permission[]
+  approved?: boolean
+  createdCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedCommands?: Prisma.CommandUncheckedCreateNestedManyWithoutInstrumentisteInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+}
+
+export type UserUpsertWithoutPushSubscriptionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPushSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPushSubscriptionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPushSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput>
+}
+
+export type UserUpdateWithoutPushSubscriptionsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  familyName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdCommands?: Prisma.CommandUpdateManyWithoutCreatedByNestedInput
+  assignedCommands?: Prisma.CommandUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  familyName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | $Enums.Permission[]
+  approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdCommands?: Prisma.CommandUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedCommands?: Prisma.CommandUncheckedUpdateManyWithoutInstrumentisteNestedInput
+  resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -763,12 +872,14 @@ export type UserCountOutputType = {
   createdCommands: number
   assignedCommands: number
   resetTokens: number
+  pushSubscriptions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdCommands?: boolean | UserCountOutputTypeCountCreatedCommandsArgs
   assignedCommands?: boolean | UserCountOutputTypeCountAssignedCommandsArgs
   resetTokens?: boolean | UserCountOutputTypeCountResetTokensArgs
+  pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs
 }
 
 /**
@@ -802,6 +913,13 @@ export type UserCountOutputTypeCountResetTokensArgs<ExtArgs extends runtime.Type
   where?: Prisma.PasswordResetTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PushSubscriptionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -816,6 +934,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
   resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>
+  pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -860,6 +979,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdCommands?: boolean | Prisma.User$createdCommandsArgs<ExtArgs>
   assignedCommands?: boolean | Prisma.User$assignedCommandsArgs<ExtArgs>
   resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>
+  pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -871,6 +991,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdCommands: Prisma.$CommandPayload<ExtArgs>[]
     assignedCommands: Prisma.$CommandPayload<ExtArgs>[]
     resetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
+    pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1279,6 +1400,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   createdCommands<T extends Prisma.User$createdCommandsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdCommandsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedCommands<T extends Prisma.User$assignedCommandsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedCommandsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   resetTokens<T extends Prisma.User$resetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$resetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pushSubscriptions<T extends Prisma.User$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1774,6 +1896,30 @@ export type User$resetTokensArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
+}
+
+/**
+ * User.pushSubscriptions
+ */
+export type User$pushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PushSubscription
+   */
+  select?: Prisma.PushSubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PushSubscription
+   */
+  omit?: Prisma.PushSubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PushSubscriptionInclude<ExtArgs> | null
+  where?: Prisma.PushSubscriptionWhereInput
+  orderBy?: Prisma.PushSubscriptionOrderByWithRelationInput | Prisma.PushSubscriptionOrderByWithRelationInput[]
+  cursor?: Prisma.PushSubscriptionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PushSubscriptionScalarFieldEnum | Prisma.PushSubscriptionScalarFieldEnum[]
 }
 
 /**
