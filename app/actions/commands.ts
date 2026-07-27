@@ -19,7 +19,7 @@ export type CommandProductInput = {
 }
 
 export type CreateCommandInput = {
-  reference: string
+  reference?: string
   type: ProthesisType
   dateIntervention: Date
   dateLivraison: Date
@@ -72,6 +72,7 @@ async function sendAssignmentNotification(
 }
 
 export async function createCommand(data: CreateCommandInput) {
+  let reference = ""
   try {
     const perm = await requirePermission("COMMAND_CREATE")
     if (!perm.ok) {
@@ -79,11 +80,15 @@ export async function createCommand(data: CreateCommandInput) {
     }
 
     const createdById = perm.userId
-    const { products, ...commandData } = data
+    const { products, reference: _ignored, ...commandData } = data
+
+    const count = await prisma.command.count()
+    reference = `REF-${String(count + 1).padStart(3, "0")}`
 
     const command = await prisma.command.create({
       data: {
         ...commandData,
+        reference,
         createdById,
         commandProducts: products && products.length > 0 ? {
           create: products.map(p => ({
@@ -98,6 +103,7 @@ export async function createCommand(data: CreateCommandInput) {
       entity: "command",
       action: "created",
       id: command.id,
+      targetUserId: command.instrumentisteId ?? undefined,
     })
 
     revalidatePath("/commands")
@@ -106,7 +112,7 @@ export async function createCommand(data: CreateCommandInput) {
   } catch (error) {
     console.error("Create command error:", error)
     if (isUniqueConstraintError(error, "reference")) {
-      return { success: false, message: `A command with reference "${data.reference}" already exists.` }
+      return { success: false, message: `A command with reference "${reference}" already exists. Please try again.` }
     }
     return { success: false, message: "Failed to create command. Please try again." }
   }
@@ -125,6 +131,11 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
     }
 
     const { products, address, clinique, doctorName, ...commandData } = data
+
+    const existing = await prisma.command.findUnique({
+      where: { id },
+      select: { instrumentisteId: true },
+    })
 
     const updateData: any = {
       ...commandData,
@@ -149,6 +160,7 @@ export async function updateCommand(id: number, data: UpdateCommandInput) {
       entity: "command",
       action: "updated",
       id: command.id,
+      targetUserId: command.instrumentisteId ?? existing?.instrumentisteId ?? undefined,
     })
 
     revalidatePath(`/commands/${id}`)
@@ -218,6 +230,11 @@ export async function deleteCommand(id: number) {
       return { success: false, message: perm.message }
     }
 
+    const existing = await prisma.command.findUnique({
+      where: { id },
+      select: { instrumentisteId: true },
+    })
+
     await prisma.command.delete({
       where: { id },
     })
@@ -226,6 +243,7 @@ export async function deleteCommand(id: number) {
       entity: "command",
       action: "deleted",
       id,
+      targetUserId: existing?.instrumentisteId ?? undefined,
     })
 
     revalidatePath("/commands")
@@ -284,6 +302,7 @@ export async function updateCommandStatus(id: number, status: CommandStatus) {
       entity: "command",
       action: "status_changed",
       id: command.id,
+      targetUserId: command.instrumentisteId ?? undefined,
     })
 
     // When an admin sets the order to AFFECTEE, notify the assigned instrumentiste.
@@ -379,6 +398,7 @@ export async function uploadCommandCompletionReport(id: number, formData: FormDa
       entity: "command",
       action: "updated",
       id,
+      targetUserId: command.instrumentisteId ?? undefined,
     })
 
     revalidatePath("/dashboard")
@@ -426,4 +446,9 @@ export async function getAllCommands() {
     console.error("Get all commands error:", error)
     return { success: false, message: "Failed to fetch commands" }
   }
+}
+
+export async function getNextCommandReference() {
+  const count = await prisma.command.count()
+  return `REF-${String(count + 1).padStart(3, "0")}`
 }

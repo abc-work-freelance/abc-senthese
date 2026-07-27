@@ -1,61 +1,92 @@
+import "dotenv/config";
+
 // WhatsApp notifications via the Meta WhatsApp Business Cloud API (free tier).
-//
-// Required environment variables:
-//   WHATSAPP_PHONE_NUMBER_ID   The phone number ID from your Meta WhatsApp app
-//   WHATSAPP_ACCESS_TOKEN      A permanent/system-user access token
-// Optional:
-//   WHATSAPP_API_VERSION       Graph API version (default: v21.0)
-//   WHATSAPP_TEMPLATE_NAME     Name of an APPROVED message template (recommended)
-//   WHATSAPP_TEMPLATE_LANG     Template language code (default: fr)
-//
-// Business-initiated messages (like an assignment notification) can only be
-// delivered as plain text if the recipient messaged the business number within
-// the last 24h. Outside that window Meta requires an APPROVED template. We try
-// the template first (when configured) and fall back to plain text.
 
-const GRAPH_API_VERSION = process.env.WHATSAPP_API_VERSION || "v21.0"
-const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN
-const TEMPLATE_NAME = process.env.WHATSAPP_TEMPLATE_NAME
-const TEMPLATE_LANG = process.env.WHATSAPP_TEMPLATE_LANG || "fr"
+function getWhatsAppConfig() {
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
+  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
+  const apiVersion = process.env.WHATSAPP_API_VERSION || "v21.0"
+  const templateName = process.env.WHATSAPP_TEMPLATE_NAME
+  const templateLang = process.env.WHATSAPP_TEMPLATE_LANG || "fr"
+  const resetTemplateName = process.env.WHATSAPP_RESET_TEMPLATE_NAME || templateName
 
-export function isWhatsAppConfigured(): boolean {
-  return Boolean(PHONE_NUMBER_ID && ACCESS_TOKEN)
+  return {
+    phoneNumberId,
+    accessToken,
+    apiVersion,
+    templateName,
+    templateLang,
+    resetTemplateName,
+  }
 }
 
-type WhatsAppResult = {
+export function isWhatsAppConfigured(): boolean {
+  const { phoneNumberId, accessToken } = getWhatsAppConfig()
+  return Boolean(phoneNumberId && accessToken)
+}
+
+export type WhatsAppResult = {
   success: boolean
   skipped?: boolean
   message?: string
+  data?: unknown
 }
 
-// WhatsApp expects the recipient in E.164 form WITHOUT the leading "+".
+/**
+ * WhatsApp expects recipient phone numbers in E.164 format without "+".
+ * E.g., Moroccan numbers (+212) should be 2126xxxxxxx or 2127xxxxxxx.
+ */
 function normalizePhone(phone: string): string {
-  const digits = phone.replace(/\D/g, "")
+  let digits = phone.replace(/\D/g, "")
+  const defaultCountryCode = process.env.WHATSAPP_DEFAULT_COUNTRY_CODE || "212"
+
+  // Local Moroccan format with leading 0: "0669609873" -> "212669609873"
+  if (digits.length === 10 && digits.startsWith("0")) {
+    digits = defaultCountryCode + digits.slice(1)
+  }
+  // Local Moroccan format without leading 0: "669609873" -> "212669609873"
+  else if (digits.length === 9 && (digits.startsWith("6") || digits.startsWith("7"))) {
+    digits = defaultCountryCode + digits
+  }
+
   return digits
 }
 
 async function postToGraph(payload: Record<string, unknown>): Promise<WhatsAppResult> {
+  const { phoneNumberId, accessToken, apiVersion } = getWhatsAppConfig()
+
+  if (!phoneNumberId || !accessToken) {
+    console.warn("[whatsapp] missing WHATSAPP_PHONE_NUMBER_ID / WHATSAPP_ACCESS_TOKEN")
+    return { success: false, skipped: true, message: "WhatsApp credentials not set" }
+  }
+
   try {
     const res = await fetch(
-      `https://graph.facebook.com/${GRAPH_API_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       }
     )
 
+    const rawBody = await res.text()
+
     if (!res.ok) {
-      const errorBody = await res.text()
-      console.error("[whatsapp] send failed:", res.status, errorBody)
-      return { success: false, message: errorBody }
+      console.error("[whatsapp] send failed:", res.status, rawBody)
+      return { success: false, message: rawBody }
     }
 
-    return { success: true }
+    console.log("[whatsapp] send success:", rawBody)
+    let parsed: unknown = rawBody
+    try {
+      parsed = JSON.parse(rawBody)
+    } catch {}
+
+    return { success: true, data: parsed }
   } catch (error) {
     console.error("[whatsapp] request error:", error)
     return { success: false, message: "Request failed" }
@@ -86,16 +117,25 @@ export async function sendWhatsAppText(to: string, body: string): Promise<WhatsA
   })
 }
 
+export type TemplateParam = string | { name: string; text: string }
+
 /**
- * Send an approved template message with positional body parameters.
- * Use this for business-initiated notifications.
+ * Send an approved template message. Supports both named parameters (e.g. {{msg}})
+ * and positional parameters (e.g. {{1}}).
+ */
+/**
+ * Send an approved template message. Supports both named parameters (e.g. {{msg}})
+ * and positional parameters (e.g. {{1}}).
  */
 export async function sendWhatsAppTemplate(
   to: string,
   templateName: string,
-  bodyParams: string[],
-  langCode: string = TEMPLATE_LANG
+  bodyParams: TemplateParam[],
+  langCode?: string
 ): Promise<WhatsAppResult> {
+  const config = getWhatsAppConfig()
+  const lang = langCode || config.templateLang
+
   if (!isWhatsAppConfigured()) {
     console.warn("[whatsapp] not configured; skipping")
     return { success: false, skipped: true }
@@ -106,27 +146,80 @@ export async function sendWhatsAppTemplate(
     return { success: false, message: "Invalid phone number" }
   }
 
-  return postToGraph({
+  // 1) Format with `parameter_name` for named parameters (e.g. {{msg}})
+  const namedParams = bodyParams.map((param) => {
+    if (typeof param === "string") {
+      return { type: "text", parameter_name: "msg", text: param }
+    }
+    return { type: "text", parameter_name: param.name, text: param.text }
+  })
+
+  const res1 = await postToGraph({
     messaging_product: "whatsapp",
     recipient_type: "individual",
     to: phone,
     type: "template",
     template: {
       name: templateName,
-      language: { code: langCode },
+      language: { code: lang },
       components: [
         {
           type: "body",
-          parameters: bodyParams.map((text) => ({ type: "text", text })),
+          parameters: namedParams,
         },
       ],
     },
   })
+
+  if (res1.success) return res1
+
+  // 2) Fallback to positional parameters without `parameter_name` if template expects {{1}}
+  if (res1.message?.includes("Parameter name") || res1.message?.includes("Invalid parameter")) {
+    const positionalParams = bodyParams.map((param) => ({
+      type: "text",
+      text: typeof param === "string" ? param : param.text,
+    }))
+
+    return postToGraph({
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: phone,
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: lang },
+        components: [
+          {
+            type: "body",
+            parameters: positionalParams,
+          },
+        ],
+      },
+    })
+  }
+
+  return res1
 }
 
 /**
- * Send a password-reset code (in French) to a user over WhatsApp. Returns the
- * result so the caller can fall back (e.g. log in dev) when delivery is skipped.
+ * Send a generic notification using the single-parameter template:
+ * "Hello, here is your update from ABC SENTHESE: {{msg}}\nHave a good day."
+ */
+export async function sendWhatsAppNotification(to: string, msg: string): Promise<WhatsAppResult> {
+  const { templateName, resetTemplateName } = getWhatsAppConfig()
+  const activeTemplate = templateName || resetTemplateName
+  if (activeTemplate) {
+    const templateResult = await sendWhatsAppTemplate(to, activeTemplate, [msg])
+    if (templateResult.success) return templateResult
+    console.warn("[whatsapp] template send failed, falling back to plain text")
+  }
+
+  return sendWhatsAppText(to, msg)
+}
+
+/**
+ * Send a password-reset code to a user over WhatsApp using the single-parameter template:
+ * "Hello, here is your update from ABC SENTHESE: {{msg}}\nHave a good day."
  */
 export async function notifyPasswordReset(
   phone: string | null | undefined,
@@ -138,18 +231,18 @@ export async function notifyPasswordReset(
     return { success: false, skipped: true, message: "No phone number on file" }
   }
 
-  // A password reset is a business-initiated message: outside the 24h window
-  // Meta only delivers it via an APPROVED template. Configure a template whose
-  // body has a single {{1}} variable (the code) and set its name below.
-  const resetTemplate = process.env.WHATSAPP_RESET_TEMPLATE_NAME
+  // Content for {{msg}} template parameter
+  const resetMsg = `Votre code de réinitialisation de mot de passe est : ${code} (valable ${ttlMinutes} minutes).`
+
+  const { resetTemplateName, templateName } = getWhatsAppConfig()
+  const resetTemplate = resetTemplateName || templateName
   if (resetTemplate) {
-    const templateResult = await sendWhatsAppTemplate(phone, resetTemplate, [code])
+    const templateResult = await sendWhatsAppTemplate(phone, resetTemplate, [resetMsg])
     if (templateResult.success) return templateResult
     console.warn("[whatsapp] reset template send failed, falling back to plain text")
   }
 
-  // Fallback: plain text — only delivers if the recipient messaged the business
-  // number within the last 24h (and, for test numbers, is allow-listed).
+  // Fallback plain text for 24h window
   const text =
     `Bonjour ${name},\n\n` +
     `Vous avez demandé à réinitialiser votre mot de passe sur la plateforme ABC Synthèse.\n\n` +
@@ -162,7 +255,7 @@ export async function notifyPasswordReset(
   return sendWhatsAppText(phone, text)
 }
 
-type AssignmentNotification = {
+export type AssignmentNotification = {
   instrumentistePhone: string | null | undefined
   instrumentisteName: string
   adminName: string
@@ -187,8 +280,8 @@ function formatFrenchDateTime(date: Date): string {
 }
 
 /**
- * Notify an instrumentiste (in French) that a command has been assigned to them.
- * Tries the configured template first, then falls back to a plain text message.
+ * Notify an instrumentiste that a command has been assigned to them using the single-parameter template:
+ * "Hello, here is your update from ABC SENTHESE: {{msg}}\nHave a good day."
  */
 export async function notifyCommandAssignment(
   data: AssignmentNotification
@@ -202,7 +295,19 @@ export async function notifyCommandAssignment(
 
   const when = formatFrenchDateTime(assignedAt)
 
-  // Professional French message.
+  // Content for {{msg}} template parameter
+  const assignmentMsg = `Bonjour ${instrumentisteName}, la commande ${reference} vous a été affectée par ${adminName} le ${when}.`
+
+  // 1) Try the approved template (works for business-initiated messages).
+  const { templateName, resetTemplateName } = getWhatsAppConfig()
+  const activeTemplate = templateName || resetTemplateName
+  if (activeTemplate) {
+    const templateResult = await sendWhatsAppTemplate(instrumentistePhone, activeTemplate, [assignmentMsg])
+    if (templateResult.success) return templateResult
+    console.warn("[whatsapp] template send failed, falling back to plain text")
+  }
+
+  // 2) Fall back to plain text (delivers within the 24h window).
   const text =
     `Bonjour ${instrumentisteName},\n\n` +
     `Une nouvelle commande vous a été affectée sur la plateforme ABC Synthèse.\n\n` +
@@ -212,18 +317,6 @@ export async function notifyCommandAssignment(
     `Merci de consulter votre espace ABC Synthèse afin d'en prendre connaissance et d'organiser l'intervention.\n\n` +
     `Cordialement,\nL'équipe ABC Synthèse`
 
-  // 1) Try the approved template (works for business-initiated messages).
-  if (TEMPLATE_NAME) {
-    const templateResult = await sendWhatsAppTemplate(instrumentistePhone, TEMPLATE_NAME, [
-      instrumentisteName,
-      adminName,
-      reference,
-      when,
-    ])
-    if (templateResult.success) return templateResult
-    console.warn("[whatsapp] template send failed, falling back to plain text")
-  }
-
-  // 2) Fall back to plain text (delivers within the 24h window).
   return sendWhatsAppText(instrumentistePhone, text)
 }
+
