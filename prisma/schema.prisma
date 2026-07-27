@@ -76,6 +76,7 @@ model User {
   createdCommands  Command[] @relation("CreatedByAdmin")
   assignedCommands Command[] @relation("AssignedToInstrumentiste")
   resetTokens      PasswordResetToken[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -177,6 +178,8 @@ model PushSubscription {
   p256dh    String
   auth      String
   userAgent String?
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 
   @@map("push_subscriptions")

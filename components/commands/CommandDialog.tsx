@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { commandSchema, CommandFormValues } from "./schema"
@@ -35,7 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon, Plus, Trash2 } from "lucide-react"
-import { createCommand, updateCommand } from "@/app/actions/commands"
+import { createCommand, updateCommand, getNextCommandReference } from "@/app/actions/commands"
 import { useToast } from "@/components/ui/toast"
 import { useRouter } from "next/navigation"
 import { ProthesisType, PaymentMode, Product, User, Command } from "@/app/generated/prisma/browser"
@@ -76,9 +76,16 @@ interface CommandDialogProps {
 
 export function CommandDialog({ command, trigger, productsList, usersList }: CommandDialogProps) {
   const [open, setOpen] = useState(false)
+  const [nextRef, setNextRef] = useState("")
   const isEditing = !!command
   const toast = useToast()
   const router = useRouter()
+
+  useEffect(() => {
+    if (open && !isEditing) {
+      getNextCommandReference().then(setNextRef)
+    }
+  }, [open, isEditing])
 
   const form = useForm<CommandFormValues>({
     resolver: zodResolver(commandSchema),
@@ -162,7 +169,7 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                     <FormItem>
                     <FormLabel>Reference</FormLabel>
                     <FormControl>
-                        <Input placeholder="REF-001" {...field} />
+                        <Input value={isEditing ? field.value : nextRef} disabled />
                     </FormControl>
                     <FormMessage />
                     </FormItem>

@@ -1,8 +1,13 @@
 "use client"
 
 import { useEffect } from "react"
+import { useSession } from "next-auth/react"
 
 export function NotificationsClient() {
+  const { data: session } = useSession()
+  const userId = session?.user?.id ? Number(session.user.id) : null
+  const role = session?.user?.role as string | undefined
+
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -21,11 +26,18 @@ export function NotificationsClient() {
         const data = JSON.parse(event.data)
         if (data.type !== "entity_change") return
 
-        const { entity, action, id } = data.payload as {
+        const { entity, action, id, targetUserId } = data.payload as {
           entity: "command" | "product"
           action: "created" | "updated" | "deleted" | "status_changed"
           id: number
+          targetUserId?: number
         }
+
+        // Admins don't get native browser notifications for commands
+        if (role === "ADMIN" && entity === "command") return
+
+        // Instrumentistes only get notifications for commands assigned to them
+        if (entity === "command" && targetUserId && targetUserId !== userId) return
 
         const title =
           entity === "command"
@@ -50,8 +62,7 @@ export function NotificationsClient() {
     return () => {
       socket.close()
     }
-  }, [])
+  }, [userId, role])
 
   return null
 }
-
