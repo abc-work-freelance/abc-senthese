@@ -360,9 +360,9 @@ export async function uploadCommandCompletionReport(id: number, formData: FormDa
       return { success: false, message: "Uploaded file is empty." }
     }
 
-    const maxSize = 10 * 1024 * 1024
+    const maxSize = 20 * 1024 * 1024
     if (file.size > maxSize) {
-      return { success: false, message: "File is too large. Maximum allowed size is 10MB." }
+      return { success: false, message: "File is too large. Maximum allowed size is 20MB." }
     }
 
     const ext = path.extname(file.name || "").toLowerCase()

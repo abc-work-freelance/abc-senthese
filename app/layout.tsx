@@ -3,6 +3,7 @@ import { IBM_Plex_Sans, IBM_Plex_Mono, DM_Serif_Display } from "next/font/google
 import "./globals.css";
 import { PushNotificationsClient } from "@/components/PushNotificationsClient";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
@@ -46,6 +47,7 @@ export default function RootLayout({
         <PushNotificationsClient />
         {children}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
