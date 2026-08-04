@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
         return
       }
       // Only move on to code entry when a code was actually delivered.
-      if (res.channel === "whatsapp") {
+      if (res.channel === "email") {
         router.push(`/reset-password?email=${encodeURIComponent(email.trim())}`)
       } else {
         setInfo(res.message)
@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
                 required
               />
             </div>
-            <p className="hint">The code is sent by WhatsApp to the phone number on your account.</p>
+            <p className="hint">The 6-digit code will be sent directly to your email inbox via Resend.</p>
           </div>
 
           {error && (

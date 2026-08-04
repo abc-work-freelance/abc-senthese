@@ -3,33 +3,29 @@
 import { prisma } from "@/lib/prisma"
 import { hash, compare } from "bcryptjs"
 import { randomInt } from "node:crypto"
-import { notifyPasswordReset } from "@/lib/whatsapp"
+import { sendPasswordResetEmail } from "@/lib/email"
 
 const CODE_TTL_MINUTES = 15
 const MAX_ATTEMPTS = 5
 
 const SENT_MESSAGE =
-  "We sent a 6-digit verification code to the WhatsApp number on your account."
-// Used both for unknown emails and accounts with no phone / failed delivery, so
-// the response can't be used to tell whether a given email is registered.
+  "We sent a 6-digit verification code to your email inbox."
 const NOT_SENT_MESSAGE =
-  "We couldn't send a verification code. The account may not have a phone number on file — please contact an administrator."
+  "We couldn't send a verification code. Please make sure your email address is correct or contact an administrator."
 
 type RequestResult = {
   success: boolean
   message: string
-  // Tells the UI whether a code actually went out (so it only advances to the
-  // code-entry step when there's a code to enter).
-  channel?: "whatsapp" | "none"
+  channel?: "email" | "none"
 }
 
 /**
  * Start the password-reset flow: generate a single-use 6-digit code, store only
- * its hash, and deliver the code over WhatsApp. Always resolves with a generic
+ * its hash, and deliver the code over Resend email. Always resolves with a generic
  * message to avoid user enumeration.
  */
 export async function requestPasswordReset(emailRaw: string): Promise<RequestResult> {
-  const email = (emailRaw ?? "").trim()
+  const email = (emailRaw ?? "").trim().toLowerCase()
 
   if (!email || !email.includes("@")) {
     return { success: false, message: "Please enter a valid email address." }
@@ -37,12 +33,11 @@ export async function requestPasswordReset(emailRaw: string): Promise<RequestRes
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, name: true, phone: true },
+    select: { id: true, name: true, email: true },
   })
 
   if (!user) {
-    // Behave identically to the "couldn't send" path so unknown emails and
-    // phone-less accounts are indistinguishable.
+    // Behave identically to the "couldn't send" path so unknown emails are indistinguishable.
     return { success: true, message: NOT_SENT_MESSAGE, channel: "none" }
   }
 
@@ -56,20 +51,23 @@ export async function requestPasswordReset(emailRaw: string): Promise<RequestRes
     prisma.passwordResetToken.create({ data: { userId: user.id, codeHash, expiresAt } }),
   ])
 
-  const result = await notifyPasswordReset(user.phone, user.name, code, CODE_TTL_MINUTES)
+  const result = await sendPasswordResetEmail({
+    to: user.email,
+    userName: user.name,
+    code,
+    ttlMinutes: CODE_TTL_MINUTES,
+  })
 
-  // Dev fallback so the flow is testable when WhatsApp can't deliver (no phone,
-  // sandbox recipient not allow-listed, expired token, etc.). Never in prod.
   if (!result.success && process.env.NODE_ENV !== "production") {
     console.info(
-      `\n[password-reset] WhatsApp delivery unavailable — code for ${email}: ${code} (valid ${CODE_TTL_MINUTES}m)\n`
+      `\n[password-reset] Resend delivery failed — code for ${email}: ${code} (valid ${CODE_TTL_MINUTES}m)\n`
     )
   }
 
   return {
     success: true,
     message: result.success ? SENT_MESSAGE : NOT_SENT_MESSAGE,
-    channel: result.success ? "whatsapp" : "none",
+    channel: result.success ? "email" : "none",
   }
 }
 
@@ -84,11 +82,11 @@ export async function resetPassword(
   codeRaw: string,
   newPassword: string
 ): Promise<ResetResult> {
-  const email = (emailRaw ?? "").trim()
+  const email = (emailRaw ?? "").trim().toLowerCase()
   const code = (codeRaw ?? "").trim()
 
   if (!/^\d{6}$/.test(code)) {
-    return { success: false, message: "Enter the 6-digit code from your message." }
+    return { success: false, message: "Enter the 6-digit code from your email inbox." }
   }
   if (!newPassword || newPassword.length < 8) {
     return { success: false, message: "Password must be at least 8 characters long." }
