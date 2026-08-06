@@ -42,10 +42,6 @@ export async function getEffectivePermissions(): Promise<AppPermission[]> {
     return [...ALL_PERMISSIONS]
   }
 
-  if (session.user.role !== "ADMIN") {
-    return []
-  }
-
   const user = await prisma.user.findUnique({
     where: { id: Number(session.user.id) },
     select: { permissions: true, approved: true },
@@ -69,10 +65,6 @@ export async function requirePermission(
 
   if (process.env.EMAILADMIN && session.user.email === process.env.EMAILADMIN) {
     return { ok: true, userId: Number(session.user.id) }
-  }
-
-  if (session.user.role !== "ADMIN") {
-    return { ok: false, message: "Forbidden: Admins only" }
   }
 
   const user = await prisma.user.findUnique({

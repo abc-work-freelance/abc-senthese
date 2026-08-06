@@ -8,7 +8,8 @@ import { revalidatePath } from "next/cache"
 import { requirePermission } from "@/lib/permissions"
 import { isUniqueConstraintError, isRecordNotFoundError } from "@/lib/prisma-errors"
 import { broadcastEntityChange } from "@/lib/ws-notify"
-import { notifyCommandAssignment } from "@/lib/whatsapp"
+import { notifyCommandAssignment, sendWhatsAppNotification } from "@/lib/whatsapp"
+import { sendNotificationEmail } from "@/lib/email"
 import { mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { randomUUID } from "node:crypto"
@@ -32,6 +33,7 @@ export type CreateCommandInput = {
   commentaire?: string
   instrumentisteId?: number
   products?: CommandProductInput[]
+  status?: CommandStatus
 }
 
 export type UpdateCommandInput = Partial<Omit<CreateCommandInput, 'products'>> & {
@@ -71,16 +73,94 @@ async function sendAssignmentNotification(
   }
 }
 
+// Helper to notify admins about a new command created by an instrumentiste
+async function notifyAdminsNewCommand(command: {
+  id: number
+  reference: string
+  type: string
+  ville: string
+  clinique?: string | null
+  doctorName?: string | null
+  dateIntervention: Date
+  createdById: number
+}) {
+  try {
+    const creator = await prisma.user.findUnique({
+      where: { id: command.createdById },
+      select: { name: true, familyName: true },
+    })
+    const creatorName = creator ? `${creator.name} ${creator.familyName}`.trim() : "Un instrumentiste"
+
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN", approved: true },
+      select: { id: true, email: true, name: true, familyName: true, phone: true },
+    })
+
+    const dateStr = command.dateIntervention
+      ? new Date(command.dateIntervention).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "—"
+
+    for (const admin of admins) {
+      const adminName = `${admin.name} ${admin.familyName}`.trim()
+
+      if (admin.email) {
+        await sendNotificationEmail({
+          to: admin.email,
+          userName: adminName,
+          subject: `Nouvelle commande ${command.reference} créée par ${creatorName}`,
+          title: "Nouvelle commande à affecter",
+          message: `L'instrumentiste ${creatorName} a créé la commande ${command.reference}. Elle est actuellement en attente d'affectation.`,
+          details: [
+            { label: "Référence", value: command.reference },
+            { label: "Créée par", value: creatorName },
+            { label: "Type", value: command.type },
+            { label: "Ville", value: command.ville },
+            { label: "Clinique", value: command.clinique || "—" },
+            { label: "Médecin", value: command.doctorName || "—" },
+            { label: "Date d'intervention", value: dateStr },
+          ],
+          actionUrl: `${process.env.NEXTAUTH_URL || ""}/dashboard#commands`,
+          actionText: "Consulter la commande",
+        })
+      }
+
+      if (admin.phone) {
+        const waMessage = `Bonjour ${adminName}, l'instrumentiste ${creatorName} a créé la nouvelle commande ${command.reference} (${command.type}, ${command.ville}). Merci de la consulter et de lui affecter un instrumentiste.`
+        await sendWhatsAppNotification(admin.phone, waMessage)
+      }
+    }
+  } catch (error) {
+    console.error("[notifyAdminsNewCommand] Error notifying admins:", error)
+  }
+}
+
 export async function createCommand(data: CreateCommandInput) {
   let reference = ""
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" }
+    }
+
+    const userId = Number(session.user.id)
+    const userRole = session.user.role
+
     const perm = await requirePermission("COMMAND_CREATE")
     if (!perm.ok) {
       return { success: false, message: perm.message }
     }
 
-    const createdById = perm.userId
+    const createdById = userId
     const { products, reference: _ignored, ...commandData } = data
+
+    if (userRole === "INSTRUMENTISTE") {
+      delete commandData.instrumentisteId
+      commandData.status = CommandStatus.VALIDEE
+    }
 
     const count = await prisma.command.count()
     reference = `REF-${String(count + 1).padStart(3, "0")}`
@@ -105,6 +185,19 @@ export async function createCommand(data: CreateCommandInput) {
       id: command.id,
       targetUserId: command.instrumentisteId ?? undefined,
     })
+
+    if (userRole === "INSTRUMENTISTE") {
+      notifyAdminsNewCommand({
+        id: command.id,
+        reference: command.reference,
+        type: command.type,
+        ville: command.ville,
+        clinique: command.clinique,
+        doctorName: command.doctorName,
+        dateIntervention: command.dateIntervention,
+        createdById,
+      }).catch((err) => console.error("Admin notification error:", err))
+    }
 
     revalidatePath("/commands")
     revalidatePath("/dashboard")

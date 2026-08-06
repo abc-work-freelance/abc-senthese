@@ -1,9 +1,40 @@
 import { Resend } from "resend"
+import nodemailer from "nodemailer"
 
-const resendApiKey = process.env.RESEND_API_KEY
-const resend = resendApiKey ? new Resend(resendApiKey) : null
+function getSmtpTransporter() {
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER)?.trim()
+  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD
+  const pass = rawPass ? rawPass.replace(/\s+/g, "").trim() : null
 
-const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || "ABC Synthese <onboarding@resend.dev>"
+  if (!user || !pass) {
+    return null
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user,
+      pass,
+    },
+  })
+
+  return { transporter, user }
+}
+
+function getSenderEmail(): string {
+  const envFrom = process.env.RESEND_FROM_EMAIL
+  if (!envFrom) {
+    return "ABC Synthese <onboarding@resend.dev>"
+  }
+  // Resend does not allow sending from unverified .vercel.app domains
+  if (envFrom.includes(".vercel.app")) {
+    console.warn(
+      `[Resend Email] Warning: RESEND_FROM_EMAIL="${envFrom}" uses a .vercel.app domain which is not supported by Resend. Falling back to "ABC Synthese <onboarding@resend.dev>".`
+    )
+    return "ABC Synthese <onboarding@resend.dev>"
+  }
+  return envFrom
+}
 
 export type SendPasswordResetEmailParams = {
   to: string
@@ -27,6 +58,75 @@ export type EmailResult = {
   success: boolean
   id?: string
   error?: string
+}
+
+/**
+ * Dispatch email via Gmail SMTP (if configured) or Resend (as fallback).
+ */
+async function sendEmailCore({
+  to,
+  subject,
+  html,
+  text,
+}: {
+  to: string
+  subject: string
+  html: string
+  text: string
+}): Promise<EmailResult> {
+  const smtp = getSmtpTransporter()
+
+  if (smtp) {
+    try {
+      const fromName = process.env.SMTP_FROM_NAME || "ABC Synthèse"
+      const info = await smtp.transporter.sendMail({
+        from: `"${fromName}" <${smtp.user}>`,
+        to,
+        subject,
+        html,
+        text,
+      })
+      console.log(`[Gmail SMTP] Email successfully sent to ${to} (MessageId: ${info.messageId})`)
+      return { success: true, id: info.messageId }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err)
+      console.error("[Gmail SMTP] Error sending email via Gmail:", errorMessage)
+      return { success: false, error: errorMessage }
+    }
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY
+  const resend = resendApiKey ? new Resend(resendApiKey) : null
+  const defaultFrom = getSenderEmail()
+
+  if (resend) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: defaultFrom,
+        to: [to],
+        subject,
+        html,
+        text,
+      })
+
+      if (error) {
+        console.error("[Resend Email] Error sending email:", error)
+        return { success: false, error: error.message }
+      }
+
+      console.log(`[Resend Email] Email sent to ${to} (ID: ${data?.id})`)
+      return { success: true, id: data?.id }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err)
+      console.error("[Resend Email] Exception sending email:", errorMessage)
+      return { success: false, error: errorMessage }
+    }
+  }
+
+  console.info(
+    `\n[Simulated Email] No Gmail SMTP or Resend API key set. Simulated delivery to ${to}:\nSubject: ${subject}\n`
+  )
+  return { success: true, id: "simulated-dev-id" }
 }
 
 /**
@@ -106,7 +206,7 @@ function renderPasswordResetHtml(userName: string, code: string, ttlMinutes: num
 }
 
 /**
- * Renders an HTML email for general system notifications (e.g. order assignment).
+ * Renders a clean HTML template for operational notifications.
  */
 function renderNotificationHtml(
   userName: string,
@@ -117,24 +217,8 @@ function renderNotificationHtml(
   actionText?: string
 ): string {
   const greetingName = userName.trim() ? userName.trim() : "Bonjour"
-  const detailsHtml = details && details.length > 0
-    ? `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 16px;">
-        ${details.map(d => `
-          <tr>
-            <td style="padding: 6px 8px; font-size: 13px; color: #64748b; font-weight: 600; width: 40%;">${d.label}:</td>
-            <td style="padding: 6px 8px; font-size: 13px; color: #0f172a; font-weight: 500;">${d.value}</td>
-          </tr>
-        `).join("")}
-       </table>`
-    : ""
-
-  const actionBtnHtml = actionUrl && actionText
-    ? `<div style="text-align: center; margin-top: 28px;">
-        <a href="${actionUrl}" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block;">
-          ${actionText}
-        </a>
-       </div>`
-    : ""
+  const baseUrl = process.env.NEXTAUTH_URL || "https://abc-senthese.vercel.app"
+  const fullActionUrl = actionUrl ? (actionUrl.startsWith("http") ? actionUrl : `${baseUrl}${actionUrl}`) : undefined
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -151,30 +235,43 @@ function renderNotificationHtml(
           
           <!-- Header Banner -->
           <tr>
-            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px 32px; text-align: center;">
-              <div style="display: inline-block; background-color: rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15);">
-                <span style="color: #ffffff; font-size: 20px; font-weight: 700; letter-spacing: 1px;">ABC SYNTHÈSE</span>
-              </div>
+            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 28px 32px; text-align: center;">
+              <span style="color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: 1px;">ABC SYNTHÈSE</span>
             </td>
           </tr>
 
-          <!-- Main Content -->
+          <!-- Content -->
           <tr>
-            <td style="padding: 36px 32px 32px 32px;">
-              <h1 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: #0f172a;">
-                ${title}
-              </h1>
-              
-              <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #475569;">
-                Bonjour ${greetingName},
+            <td style="padding: 32px;">
+              <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: #0f172a;">${title}</h2>
+              <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #475569;">
+                Bonjour ${greetingName},<br>${message}
               </p>
 
-              <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #475569;">
-                ${message}
-              </p>
+              ${
+                details && details.length > 0
+                  ? `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 12px 16px;">
+                      ${details
+                        .map(
+                          (d) => `<tr>
+                            <td style="padding: 6px 0; font-size: 13px; color: #64748b; font-weight: 600; width: 40%;">${d.label}:</td>
+                            <td style="padding: 6px 0; font-size: 13px; color: #0f172a; font-weight: 500;">${d.value}</td>
+                          </tr>`
+                        )
+                        .join("")}
+                    </table>`
+                  : ""
+              }
 
-              ${detailsHtml}
-              ${actionBtnHtml}
+              ${
+                fullActionUrl && actionText
+                  ? `<div style="text-align: center; margin-top: 24px; margin-bottom: 16px;">
+                      <a href="${fullActionUrl}" target="_blank" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);">
+                        ${actionText}
+                      </a>
+                    </div>`
+                  : ""
+              }
             </td>
           </tr>
 
@@ -182,7 +279,7 @@ function renderNotificationHtml(
           <tr>
             <td style="background-color: #f8fafc; padding: 20px 32px; border-top: 1px solid #f1f5f9; text-align: center;">
               <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                © ${new Date().getFullYear()} ABC Synthèse. Tous droits réservés.
+                © ${new Date().getFullYear()} ABC Synthèse. Notification automatique.
               </p>
             </td>
           </tr>
@@ -196,7 +293,7 @@ function renderNotificationHtml(
 }
 
 /**
- * Sends a password reset email using Resend.
+ * Sends a password reset email using Gmail SMTP or Resend.
  */
 export async function sendPasswordResetEmail({
   to,
@@ -208,50 +305,11 @@ export async function sendPasswordResetEmail({
   const html = renderPasswordResetHtml(userName, code, ttlMinutes)
   const text = `Bonjour ${userName || ""},\n\nVotre code de réinitialisation de mot de passe est: ${code}\n\nCe code est valide pendant ${ttlMinutes} minutes.`
 
-  if (!resend) {
-    console.info(
-      `\n[Resend Email] API key (RESEND_API_KEY) not set. Simulated sending password reset email to ${to}:\nCode: ${code}\nSubject: ${subject}\n`
-    )
-    return {
-      success: true,
-      id: "simulated-dev-id",
-    }
-  }
-
-  try {
-    const { data, error } = await resend.emails.send({
-      from: DEFAULT_FROM,
-      to: [to],
-      subject,
-      html,
-      text,
-    })
-
-    if (error) {
-      console.error("[Resend Email] Error sending password reset email:", error)
-      return {
-        success: false,
-        error: error.message,
-      }
-    }
-
-    console.log(`[Resend Email] Password reset email successfully sent to ${to} (ID: ${data?.id})`)
-    return {
-      success: true,
-      id: data?.id,
-    }
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[Resend Email] Exception sending password reset email:", errorMessage)
-    return {
-      success: false,
-      error: errorMessage,
-    }
-  }
+  return sendEmailCore({ to, subject, html, text })
 }
 
 /**
- * Sends a general notification email using Resend.
+ * Sends a general notification email using Gmail SMTP or Resend.
  */
 export async function sendNotificationEmail({
   to,
@@ -266,44 +324,5 @@ export async function sendNotificationEmail({
   const html = renderNotificationHtml(userName, title, message, details, actionUrl, actionText)
   const text = `Bonjour ${userName || ""},\n\n${message}`
 
-  if (!resend) {
-    console.info(
-      `\n[Resend Email] API key (RESEND_API_KEY) not set. Simulated sending notification to ${to}:\nSubject: ${subject}\nTitle: ${title}\n`
-    )
-    return {
-      success: true,
-      id: "simulated-dev-id",
-    }
-  }
-
-  try {
-    const { data, error } = await resend.emails.send({
-      from: DEFAULT_FROM,
-      to: [to],
-      subject,
-      html,
-      text,
-    })
-
-    if (error) {
-      console.error("[Resend Email] Error sending notification email:", error)
-      return {
-        success: false,
-        error: error.message,
-      }
-    }
-
-    console.log(`[Resend Email] Notification email sent to ${to} (ID: ${data?.id})`)
-    return {
-      success: true,
-      id: data?.id,
-    }
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[Resend Email] Exception sending notification email:", errorMessage)
-    return {
-      success: false,
-      error: errorMessage,
-    }
-  }
+  return sendEmailCore({ to, subject, html, text })
 }

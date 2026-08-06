@@ -26,6 +26,7 @@ type DashboardCommand = {
   address?: string | null
   doctorName?: string | null
   clinique?: string | null
+  createdById?: number
   instrumentisteId?: number | null
   completionReport?: string | null
   modePaiement?: string | null
@@ -62,7 +63,7 @@ export default async function CommandsPage({
   const role = session?.user?.role
   const userId = session?.user?.id
   const isAdmin = role === UserRole.ADMIN
-  const permissions = isAdmin ? await getEffectivePermissions() : []
+  const permissions = await getEffectivePermissions()
   const perms = {
     canCreate: permissions.includes("COMMAND_CREATE"),
     canUpdate: permissions.includes("COMMAND_UPDATE"),
@@ -70,19 +71,18 @@ export default async function CommandsPage({
     canStatus: permissions.includes("COMMAND_STATUS_UPDATE"),
   }
 
+  const parsedUserId = userId ? parseInt(userId) : null
   let commands: DashboardCommand[] = []
 
   if (role === UserRole.ADMIN) {
     const res = await getAllCommands()
     commands = res.commands as DashboardCommand[]
-  } else if (role === UserRole.INSTRUMENTISTE && userId) {
+  } else if (role === UserRole.INSTRUMENTISTE && parsedUserId) {
     const res = await getAllCommands()
-    const allowedStatuses = [CommandStatus.AFFECTEE, CommandStatus.COMPLETEE, CommandStatus.ANNULEE] as const
     commands =
       (res.commands as DashboardCommand[] | undefined)?.filter(
         (command) =>
-          command.instrumentisteId === parseInt(userId) &&
-          allowedStatuses.includes(command.status as (typeof allowedStatuses)[number])
+          command.instrumentisteId === parsedUserId || command.createdById === parsedUserId
       ) || []
   }
 
@@ -91,7 +91,12 @@ export default async function CommandsPage({
   const userMap = new Map(users.map((u) => [u.id, u]))
 
   const commandsStat = await prisma.command.findMany({
-    where: role === UserRole.INSTRUMENTISTE && userId ? { instrumentisteId: parseInt(userId) } : undefined,
+    where: role === UserRole.INSTRUMENTISTE && parsedUserId ? {
+      OR: [
+        { instrumentisteId: parsedUserId },
+        { createdById: parsedUserId }
+      ]
+    } : undefined,
   })
 
   // ---- date scaffolding ----
@@ -221,10 +226,11 @@ export default async function CommandsPage({
             {interventionsToday === 1 ? "" : "s"} scheduled today
           </p>
         </div>
-        {isAdmin && perms.canCreate && (
+        {perms.canCreate && (
           <CommandDialog
             productsList={products || []}
             usersList={users || []}
+            userRole={role}
             trigger={
               <button className="btn btn-primary" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -246,7 +252,15 @@ export default async function CommandsPage({
             <CadenceCard data={cadence} />
           </div>
 
-          <CommandsTable data={commands || []} products={products || []} users={users || []} isAdmin={isAdmin} perms={perms} query={searchQuery} />
+          <CommandsTable
+            data={commands || []}
+            products={products || []}
+            users={users || []}
+            isAdmin={isAdmin}
+            perms={perms}
+            currentUserId={parsedUserId ?? undefined}
+            query={searchQuery}
+          />
         </div>
 
         <RightPanel data={{ schedule, ops, load }} />

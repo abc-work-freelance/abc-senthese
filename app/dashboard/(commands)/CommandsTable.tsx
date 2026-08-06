@@ -51,6 +51,7 @@ interface CommandsTableProps {
   users: User[]
   isAdmin: boolean
   perms?: CommandPermissions
+  currentUserId?: number
   /** Free-text search coming from the top-bar search (?q=...). */
   query?: string
 }
@@ -97,7 +98,7 @@ const SEGMENTS = [
 
 type SegmentKey = (typeof SEGMENTS)[number]["key"]
 
-export function CommandsTable({ data, products, users, isAdmin, perms, query }: CommandsTableProps) {
+export function CommandsTable({ data, products, users, isAdmin, perms, currentUserId, query }: CommandsTableProps) {
   const router = useRouter()
   const [segment, setSegment] = useState<SegmentKey>("ALL")
   const [filterOpen, setFilterOpen] = useState(false)
@@ -344,17 +345,19 @@ export function CommandsTable({ data, products, users, isAdmin, perms, query }: 
                           </>
                         ) : (
                           <>
-                            <StatusDialog
-                              id={command.id}
-                              currentStatus={command.status}
-                              allowedStatuses={[CommandStatus.REPORTEE, CommandStatus.ANNULEE, CommandStatus.COMPLETEE]}
-                              trigger={
-                                <button className="act" title="Status" type="button">
-                                  <Activity />
-                                </button>
-                              }
-                            />
-                            {command.status === CommandStatus.COMPLETEE && (
+                            {command.instrumentisteId === currentUserId && (
+                              <StatusDialog
+                                id={command.id}
+                                currentStatus={command.status}
+                                allowedStatuses={[CommandStatus.REPORTEE, CommandStatus.ANNULEE, CommandStatus.COMPLETEE]}
+                                trigger={
+                                  <button className="act" title="Status" type="button">
+                                    <Activity />
+                                  </button>
+                                }
+                              />
+                            )}
+                            {command.status === CommandStatus.COMPLETEE && command.instrumentisteId === currentUserId && (
                               <UploadReportDialog
                                 id={command.id}
                                 trigger={

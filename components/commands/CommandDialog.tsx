@@ -72,9 +72,10 @@ interface CommandDialogProps {
   trigger?: React.ReactNode
   productsList: Product[]
   usersList: User[] // Pass users to select instrumentiste
+  userRole?: string
 }
 
-export function CommandDialog({ command, trigger, productsList, usersList }: CommandDialogProps) {
+export function CommandDialog({ command, trigger, productsList, usersList, userRole }: CommandDialogProps) {
   const [open, setOpen] = useState(false)
   const [nextRef, setNextRef] = useState("")
   const isEditing = !!command
@@ -369,30 +370,32 @@ export function CommandDialog({ command, trigger, productsList, usersList }: Com
                 )}
             />
 
-            <FormField
+            {userRole !== "INSTRUMENTISTE" && (
+              <FormField
                 control={form.control}
                 name="instrumentisteId"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Instrumentiste</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value ? field.value.toString() : ""}>
-                        <FormControl>
-                      <SelectTrigger>
-                            <SelectValue placeholder="Select instrumentiste" />
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select instrumentiste" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         {usersList.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
+                          <SelectItem key={user.id} value={user.id.toString()}>
                             {user.name} ({user.email})
-                            </SelectItem>
+                          </SelectItem>
                         ))}
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-            />
+              />
+            )}
 
              <div className="space-y-2">
                 <div className="flex items-center justify-between">

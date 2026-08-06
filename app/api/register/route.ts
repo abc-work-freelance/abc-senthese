@@ -50,6 +50,7 @@ export async function POST(req: Request) {
         role,
         phone: phone ? String(phone).trim() : null,
         approved: isSuperAdmin,
+        permissions: role === "INSTRUMENTISTE" ? ["COMMAND_CREATE"] : [],
       },
     })
 
