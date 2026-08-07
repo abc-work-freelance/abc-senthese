@@ -51,7 +51,7 @@ async function sendAssignmentNotification(
     const [instrumentiste, admin] = await Promise.all([
       prisma.user.findUnique({
         where: { id: instrumentisteId },
-        select: { name: true, familyName: true, phone: true },
+        select: { name: true, familyName: true, phone: true, email: true },
       }),
       prisma.user.findUnique({
         where: { id: adminId },
@@ -61,15 +61,37 @@ async function sendAssignmentNotification(
 
     if (!instrumentiste) return
 
+    const instrumentisteName = `${instrumentiste.name} ${instrumentiste.familyName}`.trim()
+    const adminName = admin ? `${admin.name} ${admin.familyName}`.trim() : "L'administration"
+
+    // Send WhatsApp notification
     await notifyCommandAssignment({
       instrumentistePhone: instrumentiste.phone,
-      instrumentisteName: `${instrumentiste.name} ${instrumentiste.familyName}`.trim(),
-      adminName: admin ? `${admin.name} ${admin.familyName}`.trim() : "L'administration",
+      instrumentisteName,
+      adminName,
       reference,
       assignedAt: new Date(),
     })
+
+    // Send email notification
+    if (instrumentiste.email) {
+      await sendNotificationEmail({
+        to: instrumentiste.email,
+        userName: instrumentisteName,
+        subject: `Nouvelle commande ${reference} affectée`,
+        title: "Nouvelle commande affectée",
+        message: `La commande ${reference} vous a été affectée par ${adminName}.`,
+        details: [
+          { label: "Référence", value: reference },
+          { label: "Affectée par", value: adminName },
+          { label: "Date d'affectation", value: new Date().toLocaleDateString("fr-FR") },
+        ],
+        actionUrl: `${process.env.NEXTAUTH_URL || ""}/dashboard#commands`,
+        actionText: "Consulter la commande",
+      })
+    }
   } catch (error) {
-    console.error("[whatsapp] assignment notification error:", error)
+    console.error("[assignment notification] error:", error)
   }
 }
 

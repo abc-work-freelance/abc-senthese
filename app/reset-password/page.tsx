@@ -40,7 +40,7 @@ function ResetForm() {
     <div className="fp-inner">
       <div className="fp-head">
         <h1>Reset password</h1>
-        <p>Enter the verification code sent to your email inbox and choose a new password.</p>
+        <p>Enter the verification code sent to your email inbox and/or WhatsApp and choose a new password.</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -77,7 +77,7 @@ function ResetForm() {
               required
             />
           </div>
-          <p className="hint">6-digit code sent to your email inbox. It expires after 15 minutes.</p>
+          <p className="hint">6-digit code sent to your email inbox and/or WhatsApp. It expires after 15 minutes.</p>
         </div>
 
         <div className="field">

@@ -4,24 +4,25 @@ import { prisma } from "@/lib/prisma"
 import { hash, compare } from "bcryptjs"
 import { randomInt } from "node:crypto"
 import { sendPasswordResetEmail } from "@/lib/email"
+import { notifyPasswordReset } from "@/lib/whatsapp"
 
 const CODE_TTL_MINUTES = 15
 const MAX_ATTEMPTS = 5
 
 const SENT_MESSAGE =
-  "We sent a 6-digit verification code to your email inbox."
+  "We sent a 6-digit verification code to your email inbox and/or WhatsApp."
 const NOT_SENT_MESSAGE =
-  "We couldn't send a verification code. Please make sure your email address is correct or contact an administrator."
+  "We couldn't send a verification code. Please make sure your email address and/or phone number are correct or contact an administrator."
 
 type RequestResult = {
   success: boolean
   message: string
-  channel?: "email" | "none"
+  channel?: "email" | "whatsapp" | "both" | "none"
 }
 
 /**
  * Start the password-reset flow: generate a single-use 6-digit code, store only
- * its hash, and deliver the code over Resend email. Always resolves with a generic
+ * its hash, and deliver the code over email and WhatsApp. Always resolves with a generic
  * message to avoid user enumeration.
  */
 export async function requestPasswordReset(emailRaw: string): Promise<RequestResult> {
@@ -33,7 +34,7 @@ export async function requestPasswordReset(emailRaw: string): Promise<RequestRes
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, familyName: true, email: true, phone: true },
   })
 
   if (!user) {
@@ -51,23 +52,42 @@ export async function requestPasswordReset(emailRaw: string): Promise<RequestRes
     prisma.passwordResetToken.create({ data: { userId: user.id, codeHash, expiresAt } }),
   ])
 
-  const result = await sendPasswordResetEmail({
+  // Send email notification
+  const emailResult = await sendPasswordResetEmail({
     to: user.email,
     userName: user.name,
     code,
     ttlMinutes: CODE_TTL_MINUTES,
   })
 
-  if (!result.success && process.env.NODE_ENV !== "production") {
+  // Send WhatsApp notification if phone number is available
+  let whatsappSuccess = false
+  if (user.phone) {
+    const fullName = `${user.name} ${user.familyName}`.trim()
+    const whatsappResult = await notifyPasswordReset(user.phone, fullName, code, CODE_TTL_MINUTES)
+    whatsappSuccess = whatsappResult.success
+  }
+
+  if (!emailResult.success && !whatsappSuccess && process.env.NODE_ENV !== "production") {
     console.info(
-      `\n[password-reset] Resend delivery failed — code for ${email}: ${code} (valid ${CODE_TTL_MINUTES}m)\n`
+      `\n[password-reset] All delivery failed — code for ${email}: ${code} (valid ${CODE_TTL_MINUTES}m)\n`
     )
+  }
+
+  // Determine which channels succeeded
+  let channel: "email" | "whatsapp" | "both" | "none" = "none"
+  if (emailResult.success && whatsappSuccess) {
+    channel = "both"
+  } else if (emailResult.success) {
+    channel = "email"
+  } else if (whatsappSuccess) {
+    channel = "whatsapp"
   }
 
   return {
     success: true,
-    message: result.success ? SENT_MESSAGE : NOT_SENT_MESSAGE,
-    channel: result.success ? "email" : "none",
+    message: (emailResult.success || whatsappSuccess) ? SENT_MESSAGE : NOT_SENT_MESSAGE,
+    channel,
   }
 }
 
@@ -76,6 +96,7 @@ type ResetResult = { success: boolean; message: string }
 /**
  * Complete the flow: verify the code and set a new password. Codes are
  * single-use, time-limited, and rate-limited via the attempts counter.
+ * The code can be received via email, WhatsApp, or both.
  */
 export async function resetPassword(
   emailRaw: string,
@@ -86,7 +107,7 @@ export async function resetPassword(
   const code = (codeRaw ?? "").trim()
 
   if (!/^\d{6}$/.test(code)) {
-    return { success: false, message: "Enter the 6-digit code from your email inbox." }
+    return { success: false, message: "Enter the 6-digit code from your email inbox or WhatsApp." }
   }
   if (!newPassword || newPassword.length < 8) {
     return { success: false, message: "Password must be at least 8 characters long." }

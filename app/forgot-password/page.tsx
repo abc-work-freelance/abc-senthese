@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
         return
       }
       // Only move on to code entry when a code was actually delivered.
-      if (res.channel === "email") {
+      if (res.channel === "email" || res.channel === "whatsapp" || res.channel === "both") {
         router.push(`/reset-password?email=${encodeURIComponent(email.trim())}`)
       } else {
         setInfo(res.message)
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
       <div className="fp-inner">
         <div className="fp-head">
           <h1>Forgot password</h1>
-          <p>Enter your account email and we&apos;ll send a verification code to reset your password.</p>
+          <p>Enter your account email and we&apos;ll send a verification code to reset your password via email and/or WhatsApp.</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
                 required
               />
             </div>
-            <p className="hint">The 6-digit code will be sent directly to your email inbox via Resend.</p>
+            <p className="hint">The 6-digit code will be sent to your email inbox and/or WhatsApp if configured.</p>
           </div>
 
           {error && (
